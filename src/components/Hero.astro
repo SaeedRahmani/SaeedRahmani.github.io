@@ -273,9 +273,147 @@ import { siteConfig } from "../config";
       )
     }
   </div>
+
+  <!-- Full-hero animated network background -->
+  <div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
+    <canvas id="hero-net" class="w-full h-full"></canvas>
+  </div>
 </div>
 
+<!-- Full-hero animated network background -->
+<div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
+  <canvas id="hero-net" class="w-full h-full"></canvas>
+</div>
+
+<script is:inline>
+  (function () {
+    const hero = document.getElementById('hero');
+    const canvas = document.getElementById('hero-net');
+    if (!hero || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const accent = getComputedStyle(hero).getPropertyValue('--accent-color').trim();
+    const { r, g, b } = (function hexToRgb(hex) {
+      const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+      if (!m) return { r: 29, g: 78, b: 216 };
+      return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+    })(accent);
+
+    let vw = 0, vh = 0, dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    function resize() {
+      const rect = hero.getBoundingClientRect();
+      vw = Math.max(1, Math.floor(rect.width));
+      vh = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(vw * dpr);
+      canvas.height = Math.floor(vh * dpr);
+      canvas.style.width = vw + 'px';
+      canvas.style.height = vh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      configure();
+    }
+    window.addEventListener('resize', resize, { passive: true });
+
+    let nodes = [];
+    let maxDist = 0;
+    let nodeCount = 0;
+    let mouse = { x: -9999, y: -9999 };
+
+    function configure() {
+      const target = Math.floor((vw * vh) / 16000);
+      nodeCount = Math.max(60, Math.min(240, target));
+      maxDist = Math.max(80, Math.min(220, Math.sqrt(vw * vh) / 6));
+      if (nodes.length > nodeCount) nodes.length = nodeCount;
+      else while (nodes.length < nodeCount) nodes.push(makeNode());
+    }
+
+    function rand(min, max) { return min + Math.random() * (max - min); }
+    function makeNode() {
+      const speed = rand(0.2, 0.6);
+      const angle = rand(0, Math.PI * 2);
+      return {
+        x: rand(0, vw), y: rand(0, vh),
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        drift: rand(0.001, 0.004), phase: rand(0, 1000),
+        size: rand(1.2, 2.2)
+      };
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top;
+    });
+    canvas.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+    function updateNode(n) {
+      n.phase += n.drift;
+      n.x += n.vx + Math.cos(n.phase) * 0.15;
+      n.y += n.vy + Math.sin(n.phase * 0.9) * 0.15;
+
+      if (mouse.x > 0 && mouse.y > 0) {
+        const dx = mouse.x - n.x, dy = mouse.y - n.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < 6500) { n.x -= dx / 400; n.y -= dy / 400; }
+      }
+
+      if (n.x < -10) n.x = vw + 10;
+      if (n.x > vw + 10) n.x = -10;
+      if (n.y < -10) n.y = vh + 10;
+      if (n.y > vh + 10) n.y = -10;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, vw, vh);
+
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < maxDist) {
+            const t = 1 - dist / maxDist;
+            ctx.globalAlpha = 0.08 * t;
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 1)`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2); ctx.fill();
+
+        ctx.globalAlpha = 0.25;
+        const gRad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.size * 6);
+        gRad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.25)`);
+        gRad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        ctx.fillStyle = gRad;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.size * 6, 0, Math.PI * 2); ctx.fill();
+      }
+
+      for (let i = 0; i < nodes.length; i++) updateNode(nodes[i]);
+
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    nodes = Array.from({ length: nodeCount }, makeNode);
+    draw();
+  })();
+</script>
+
 <style>
+
+  #hero-net {
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.2s forwards;
+  }
+  
   @keyframes fadeIn {
     from {
       opacity: 0;
