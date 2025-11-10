@@ -273,19 +273,213 @@ import { siteConfig } from "../config";
       )
     }
   </div>
-
   <!-- Full-hero animated network background -->
   <div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
     <canvas id="hero-net" class="w-full h-full"></canvas>
   </div>
 </div>
 
-<!-- Full-hero animated network background -->
-<div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
-  <canvas id="hero-net" class="w-full h-full"></canvas>
-</div>
-
 <script is:inline>
+  (function () {
+    const hero = document.getElementById('hero');
+    const canvas = document.getElementById('hero-net');
+    if (!hero || !canvas) return;
+
+    const ctx = canvas.getContext('2d'); if (!ctx) return;
+
+    // Accent color -> rgb
+    const accent = getComputedStyle(hero).getPropertyValue('--accent-color').trim();
+    const { r, g, b } = (function hexToRgb(hex) {
+      const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+      if (!m) return { r: 29, g: 78, b: 216 };
+      return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+    })(accent);
+
+    // Settings (tweak freely)
+    let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // cap DPR for perf
+    let vw = 0, vh = 0;
+    let nodes = [];
+    let nodeCount = 0;
+    let maxDist = 0;
+
+    // Cursor interaction
+    const mouse = { x: -9999, y: -9999, inside: false };
+    const repelRadius = () => Math.max(90, Math.min(220, Math.sqrt(vw * vh) / 5.5));
+    const repelStrength = 0.65;    // base repulsion factor (higher = stronger)
+    const swirlStrength = 0.12;    // tangential swirl around cursor
+
+    // Reduced motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resize() {
+      const rect = hero.getBoundingClientRect();
+      vw = Math.max(1, Math.floor(rect.width));
+      vh = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(vw * dpr);
+      canvas.height = Math.floor(vh * dpr);
+      canvas.style.width = vw + 'px';
+      canvas.style.height = vh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Density & link length scale with area
+      const target = Math.floor((vw * vh) / 72000);
+      nodeCount = Math.max(70, Math.min(260, target));
+      maxDist = Math.max(90, Math.min(240, Math.sqrt(vw * vh) / 6.5));
+
+      // Adjust node pool
+      if (nodes.length > nodeCount) nodes.length = nodeCount;
+      while (nodes.length < nodeCount) nodes.push(makeNode());
+    }
+
+    function rand(min, max) { return min + Math.random() * (max - min); }
+    function makeNode() {
+      const angle = rand(0, Math.PI * 2);
+      const speed = rand(0.15, 0.55);
+      return {
+        x: rand(0, vw), y: rand(0, vh),
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        phase: rand(0, 1000), drift: rand(0.0012, 0.0035),
+        size: rand(1.2, 2.2)
+      };
+    }
+
+    // Mouse events
+    // canvas.addEventListener('mousemove', (e) => {
+    //   const rect = canvas.getBoundingClientRect();
+    //   mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top;
+    //   mouse.inside = true;
+    // }, { passive: true });
+    // canvas.addEventListener('mouseleave', () => { mouse.inside = false; mouse.x = -9999; mouse.y = -9999; });
+    // Mouse events on the hero (not the canvas)
+    hero.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      mouse.inside = true;
+    }, { passive: true });
+
+    hero.addEventListener('mouseleave', () => {
+      mouse.inside = false;
+      mouse.x = -9999;
+      mouse.y = -9999;
+    });
+
+    // Visibility pause
+    let running = true;
+    document.addEventListener('visibilitychange', () => { running = document.visibilityState === 'visible'; });
+
+    // Adaptive throttle if frames slow
+    let lastTime = performance.now(), fpsSMA = 60;
+    function trackFPS(now) {
+      const dt = now - lastTime; lastTime = now;
+      const fps = 1000 / Math.max(dt, 1);
+      fpsSMA = fpsSMA * 0.9 + fps * 0.1;
+      // If sustained < 35 fps, reduce node count a bit
+      if (fpsSMA < 35 && nodes.length > 80) nodes.length = Math.floor(nodes.length * 0.95);
+    }
+
+    function updateNode(n) {
+      n.phase += n.drift;
+      // Noise drift
+      n.x += n.vx + Math.cos(n.phase) * 0.12;
+      n.y += n.vy + Math.sin(n.phase * 0.9) * 0.12;
+
+      // Cursor repulsion + swirl
+      if (mouse.inside) {
+        const dx = n.x - mouse.x;
+        const dy = n.y - mouse.y;
+        const d = Math.hypot(dx, dy) || 1;
+        const R = repelRadius();
+        if (d < R) {
+          const t = 1 - d / R; // 0..1 (closer -> stronger)
+          // Radial push (escape)
+          const push = repelStrength * (t * t + 0.05);
+          n.x += (dx / d) * push * 6.0;
+          n.y += (dy / d) * push * 6.0;
+          // Tangential swirl (perpendicular)
+          const tx = -dy / d, ty = dx / d;
+          n.x += tx * swirlStrength * t * 8.0;
+          n.y += ty * swirlStrength * t * 8.0;
+        }
+      }
+
+      // Wrap
+      if (n.x < -10) n.x = vw + 10;
+      if (n.x > vw + 10) n.x = -10;
+      if (n.y < -10) n.y = vh + 10;
+      if (n.y > vh + 10) n.y = -10;
+    }
+
+    function drawFrame(now) {
+      if (!running || prefersReduced) return; // pause if hidden or reduced motion
+      trackFPS(now);
+
+      ctx.clearRect(0, 0, vw, vh);
+
+      // Lines (fade near cursor for effect)
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < maxDist) {
+            let t = 1 - dist / maxDist; // base proximity
+            // Boost visibility near the cursor
+            if (mouse.inside) {
+              const mcx = (a.x + b.x) * 0.5 - mouse.x;
+              const mcy = (a.y + b.y) * 0.5 - mouse.y;
+              const md = Math.hypot(mcx, mcy);
+              const R = repelRadius() * 1.1;
+              if (md < R) t += (1 - md / R) * 0.25;
+            }
+            ctx.globalAlpha = 0.07 * t;
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 1)`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Nodes + glow
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        ctx.globalAlpha = 0.95;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2); ctx.fill();
+
+        ctx.globalAlpha = 0.22;
+        const gRad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.size * 6);
+        gRad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.22)`);
+        gRad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        ctx.fillStyle = gRad;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.size * 6, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Update physics
+      for (let i = 0; i < nodes.length; i++) updateNode(nodes[i]);
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    // Init
+    resize();
+    nodes = Array.from({ length: nodeCount }, makeNode);
+    if (!prefersReduced) requestAnimationFrame(drawFrame);
+
+    window.addEventListener('resize', () => {
+      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      resize();
+    }, { passive: true });
+  })();
+</script>
+
+ <!-- Static JS for animated network background -->
+
+<!-- <script is:inline>
   (function () {
     const hero = document.getElementById('hero');
     const canvas = document.getElementById('hero-net');
@@ -405,7 +599,7 @@ import { siteConfig } from "../config";
     nodes = Array.from({ length: nodeCount }, makeNode);
     draw();
   })();
-</script>
+</script> -->
 
 <style>
 
@@ -413,7 +607,7 @@ import { siteConfig } from "../config";
   opacity: 0;
   animation: fadeIn 1s ease-out 0.2s forwards;
   }
-  
+
   @keyframes fadeIn {
     from {
       opacity: 0;
