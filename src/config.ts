@@ -19,29 +19,6 @@ export const siteConfig = {
     "Waymax",
     "GPUDrive",
   ],
-  projects: [
-    {
-      name: "Simulation Agents for Mixed-Autonomy Traffic",
-      description:
-        "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles",
-      link: "https://github.com/SaeedRahmani",
-      skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
-    },
-    {
-      name: "Imitation Learning for AVs Inside World Models",
-      description:
-        "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios",
-      link: "https://github.com/SaeedRahmani",
-      skills: ["Python", "PyTorch", "World Models"],
-    },
-    {
-      name: "Edge Case Detection for Autonomous Driving",
-      description:
-        "Foundation model-based system for detecting critical edge cases in autonomous driving systems (Hi-Drive Project)",
-      link: "https://hi-drive.eu",
-      skills: ["VLMs", "Deep Learning", "Python"],
-    },
-  ],
   experience: [
     {
       company: "Oxford University, UK",
@@ -84,6 +61,29 @@ export const siteConfig = {
         "Developed a hybrid MPC-RL framework for motion planning with 50% higher efficiency",
         "Co-designed simAgent algorithms for the EU Horizon 2020 flagship Project Hi-Drive",
       ],
+    },
+  ],
+    projects: [
+          {
+      name: "Imitation Learning for AVs Inside World Models",
+      description:
+        "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios",
+      link: "https://github.com/SaeedRahmani",
+      skills: ["Python", "PyTorch", "World Models"],
+    },
+    {
+      name: "Simulation Agents for Mixed-Autonomy Traffic",
+      description:
+        "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles",
+      link: "https://github.com/SaeedRahmani",
+      skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
+    },
+    {
+      name: "Edge Case Detection for Autonomous Driving",
+      description:
+        "Foundation model-based system for detecting critical edge cases in autonomous driving systems (Hi-Drive Project)",
+      link: "https://hi-drive.eu",
+      skills: ["VLMs", "Deep Learning", "Python"],
     },
   ],
   education: [
@@ -135,21 +135,23 @@ export const siteConfig = {
     },
     {
       title:
+        "🏆 A Bi-Level Real-Time Microsimulation Framework for Modeling Two-Dimensional Vehicular Maneuvers",
+      authors:
+        "Rahmani, S., Neumann, J., Elbert Suryana, L., Theunisse, C., C. Calvert, S., van Arem, B.",
+      venue: "IEEE ITSC 2023, Spain",
+      year: "2023",
+      type: "Conference",
+      award: "Best Student Paper Runner-up Award",
+      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+    },
+    {
+      title:
         "A Human-Reasoning Supervision Framework for Ethical Decision-Making in Automated Vehicles",
       authors:
         "Elbert Suryana, L., Rahmani, S., C. Calvert, S., Zgonnikov, A., van Arem, B.",
       venue: "IEEE IROS 2025",
       year: "2025",
       type: "Conference",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
-    },
-    {
-      title:
-        "Safe and Efficient Autonomous Driving at Unsignalized Intersections: An Integrated Model Predictive Control and Reinforcement Learning Approach",
-      authors: "Rahmani, S., Xu, G., Cörpe, G., C. Calvert, S., van Arem, B.",
-      venue: "Submitted to Journal",
-      year: "2025",
-      type: "Journal",
       link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
     },
     {
@@ -173,22 +175,20 @@ export const siteConfig = {
     },
     {
       title:
-        "A Bi-Level Real-Time Microsimulation Framework for Modeling Two-Dimensional Vehicular Maneuvers",
-      authors:
-        "Rahmani, S., Neumann, J., Elbert Suryana, L., Theunisse, C., C. Calvert, S., van Arem, B.",
-      venue: "IEEE ITSC 2023, Spain",
-      year: "2023",
-      type: "Conference",
-      award: "Best Student Paper Runner-up Award",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
-    },
-    {
-      title:
         "Edge Case Detection in Automated Driving: Methods, Challenges and Future Directions",
       authors:
         "Rahmani, S., Rieder, S., Gelder, E., Sonntag, M., Mallada, J. L., Kalisvaart, S., Hashemi, V., Calvert, S. C.",
       venue: "Under Review at IEEE T-ITS",
       year: "2024",
+      type: "Journal",
+      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+    },
+    {
+      title:
+        "Safe and Efficient Autonomous Driving at Unsignalized Intersections: An Integrated Model Predictive Control and Reinforcement Learning Approach",
+      authors: "Rahmani, S., Xu, G., Cörpe, G., C. Calvert, S., van Arem, B.",
+      venue: "Submitted to Journal",
+      year: "2025",
       type: "Journal",
       link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
     },
