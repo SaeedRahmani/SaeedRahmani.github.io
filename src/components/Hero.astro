@@ -659,14 +659,29 @@ import { siteConfig } from "../config";
   /* Container positioning */
   .scroll-indicator-container {
     position: absolute;
-    bottom: 4rem;
-    right: 4rem;
+    bottom: 2rem;
+    right: 2rem;
     cursor: pointer;
     text-align: center;
     pointer-events: auto;
     opacity: 0.6;
     transition: opacity .3s ease;
     z-index: 10;
+  }
+
+  /* Responsive positioning to match social icons */
+  @media (min-width: 640px) {
+    .scroll-indicator-container {
+      bottom: 3rem;
+      right: 3rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .scroll-indicator-container {
+      bottom: 6rem;
+      right: 6rem;
+    }
   }
 
   /* Mouse outline */
