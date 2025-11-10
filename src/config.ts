@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Saeed Rahmani",
+  name: "Saeed",
   title: "PhD Candidate | AI & Robotics Researcher",
   description: "Portfolio website of Saeed Rahmani - PhD candidate specializing in Foundation Models, Reinforcement Learning, and Autonomous Systems",
   accentColor: "#1d4ed8",
