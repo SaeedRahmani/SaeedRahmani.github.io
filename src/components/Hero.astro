@@ -277,7 +277,28 @@ import { siteConfig } from "../config";
   <div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
     <canvas id="hero-net" class="w-full h-full"></canvas>
   </div>
+  <!-- Modern scroll indicator -->
+  <div id="scroll-indicator" class="scroll-indicator-container">
+    <div class="mouse-shape">
+      <div class="mouse-dot"></div>
+    </div>
+    <span class="scroll-text">scroll</span>
+  </div>
 </div>
+
+<script is:inline>
+  (function () {
+    const hero = document.getElementById('hero');
+    const indicator = document.getElementById('scroll-indicator');
+
+    indicator.addEventListener('click', () => {
+      const next = hero.nextElementSibling;
+      if (next) next.scrollIntoView({ behavior: "smooth" });
+      else window.scrollBy({ top: window.innerHeight, behavior: "smooth" });
+    });
+  })();
+</script>
+
 
 <script is:inline>
   (function () {
@@ -635,4 +656,71 @@ import { siteConfig } from "../config";
   .animation-delay-600 {
     animation-delay: 0.6s;
   }
+  /* Container positioning */
+  .scroll-indicator-container {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    text-align: center;
+    pointer-events: auto;
+    opacity: 0.6;
+    transition: opacity .3s ease;
+    z-index: 10;
+  }
+
+  /* Mouse outline */
+  .mouse-shape {
+    width: 34px;
+    height: 58px;
+    border: 2px solid rgba(100, 100, 100, 0.35);
+    border-radius: 22px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    backdrop-filter: blur(2px);
+  }
+
+  /* Moving dot */
+  .mouse-dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(150, 150, 150, 0.6);
+    border-radius: 50%;
+    margin-top: 6px;
+    animation: mouse-scroll 1.4s ease-in-out infinite;
+  }
+
+  /* scroll text */
+  .scroll-text {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: .45rem;
+    color: rgba(120, 120, 120, 0.55);
+    font-weight: 500;
+  }
+
+  /* Hover effect */
+  .scroll-indicator-container:hover {
+    opacity: 1;
+  }
+
+  /* Dot animation */
+  @keyframes mouse-scroll {
+    0% { transform: translateY(0px); opacity: 1; }
+    60% { opacity: 1; }
+    100% { transform: translateY(18px); opacity: 0; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .mouse-dot { animation: none; opacity: 0.8; }
+  }
+
+
 </style>
