@@ -343,9 +343,9 @@ import { siteConfig } from "../config";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Density & link length scale with area
-      const target = Math.floor((vw * vh) / 72000);
+      const target = Math.floor((vw * vh) / 36000);
       nodeCount = Math.max(70, Math.min(260, target));
-      maxDist = Math.max(90, Math.min(240, Math.sqrt(vw * vh) / 6.5));
+      maxDist = Math.max(90, Math.min(240, Math.sqrt(vw * vh) / 6));
 
       // Adjust node pool
       if (nodes.length > nodeCount) nodes.length = nodeCount;
