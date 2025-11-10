@@ -53,6 +53,7 @@ export const siteConfig = {
       company: "Oxford University, UK",
       title: "Multi-agent Learning, Exchange PhD",
       dateRange: "Aug. 2025 - present",
+      logo: "/logos/oxford.png",
       bullets: [
         "Developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement",
         "Implemented behavior cloning (BC) policies in complex and uncertain environments with more than 60 agents in each scenario",
@@ -62,6 +63,7 @@ export const siteConfig = {
       company: "Toyota Motors Europe, Belgium",
       title: "VLMs and Transformers, Research Intern",
       dateRange: "Oct. 2025 – present",
+      logo: "/logos/toyota.png",
       bullets: [
         "Training transformer-based vision models for predicting abnormal scenarios from dashcam videos",
         "Conducting a comparative analysis of rule-based vs. AI-based anomaly detection methods in autonomous systems",
@@ -71,6 +73,7 @@ export const siteConfig = {
       company: "BMW Group, Germany",
       title: "Simulation Agent Modeler, Visiting Research Engineer",
       dateRange: "Aug. 2024",
+      logo: "/logos/bmw.png",
       bullets: [
         "Debugged a simulation agent model and an autonomous control algorithm for safety-critical scenarios",
         "Designed and implemented 14 challenging scenarios for safety validation of autonomous vehicles",
@@ -80,6 +83,7 @@ export const siteConfig = {
       company: "TU Delft, Netherlands",
       title: "PhD Candidate",
       dateRange: "Jan. 2022 – present",
+      logo: "/logos/tudelft.png",
       bullets: [
         "Developed an award-winning real-time MPC-based simulation framework for autonomous vehicles (IEEE ITSC 2023 Award Winner)",
         "Leveraged Foundation Models (VLMs) for critical trajectory failure detection with 90%+ accuracy on zero-shot learning",

@@ -36,21 +36,26 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
                   {/* Experience card */}
                   <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 hover:shadow-md transition-shadow duration-300">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                      <div>
-                        <h3 class="text-lg sm:text-xl font-semibold text-gray-900">
-                          {exp.title}
-                        </h3>
-                        <p
-                          class="text-base sm:text-lg"
-                          style={`color: ${siteConfig.accentColor}`}
-                        >
-                          {exp.company}
-                        </p>
+                        <div class="flex items-center gap-3">
+                          {exp.logo && (
+                            <img src={exp.logo} alt={exp.company} class="w-18 h-18 object-contain rounded" />
+                          )}
+                          <div>
+                            <h3 class="text-lg sm:text-xl font-semibold text-gray-900">
+                              {exp.title}
+                            </h3>
+                            <p
+                              class="text-base sm:text-lg"
+                              style={`color: ${siteConfig.accentColor}`}
+                            >
+                              {exp.company}
+                            </p>
+                          </div>
+                        </div>
+                        <span class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-0">
+                          {exp.dateRange}
+                        </span>
                       </div>
-                      <span class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-0">
-                        {exp.dateRange}
-                      </span>
-                    </div>
 
                     <ul class="space-y-2">
                       {exp.bullets.map((bullet) => (
