@@ -10,17 +10,11 @@ export const siteConfig = {
     github: "https://github.com/SaeedRahmani",
   },
   aboutMe:
-    "I am a PhD candidate, expected to graduate in January 2026, with experience and interest in artificial intelligence for robotics. I have hands-on experience with Foundation Models (both LLMs and VLMs), World Models, and Reinforcement Learning for robot learning, especially in complex and uncertain environments. My research focuses on developing AI systems for autonomous vehicles in the mixed-autonomy era, combining model predictive control, reinforcement learning, and foundation models to create safe and efficient autonomous driving systems.",
+    "I am a PhD candidate, expected to graduate in January 2026, with experience and interest in artificial intelligence for robotics. I have hands-on experience with <strong>Foundation Models</strong> (both LLMs and VLMs), <strong>World Models</strong>, and <strong>Reinforcement Learning</strong> for robot learning, especially in complex and uncertain environments. My research focuses on developing AI systems for <strong>autonomous vehicles</strong> in the mixed-autonomy era.",
   skills: [
     "Python (PyTorch, TensorFlow, JAX)",
     "C++",
-    "MATLAB",
     "Julia",
-    "Reinforcement Learning",
-    "Foundation Models (VLMs, LLMs)",
-    "Deep Learning",
-    "Multi-Agent RL (MARL)",
-    "Model Predictive Control",
     "Gym",
     "Waymax",
     "GPUDrive",
