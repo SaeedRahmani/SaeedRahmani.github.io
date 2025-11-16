@@ -21,16 +21,6 @@ export const siteConfig = {
   ],
   experience: [
     {
-      company: "Oxford University, UK",
-      title: "Multi-agent Learning, Exchange PhD",
-      dateRange: "Aug. 2025 - present",
-      logo: "/logos/oxford.png",
-      bullets: [
-        "Developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement",
-        "Implemented behavior cloning (BC) policies in complex and uncertain environments with more than 60 agents in each scenario",
-      ],
-    },
-    {
       company: "Toyota Motors Europe, Belgium",
       title: "VLMs and Transformers, Research Intern",
       dateRange: "Oct. 2025 – present",
@@ -38,6 +28,16 @@ export const siteConfig = {
       bullets: [
         "Training transformer-based vision models for predicting abnormal scenarios from dashcam videos",
         "Conducting a comparative analysis of rule-based vs. AI-based anomaly detection methods in autonomous systems",
+      ],
+    },
+    {
+      company: "Oxford University, UK",
+      title: "Multi-agent Learning, Exchange PhD",
+      dateRange: "Aug. 2025 - present",
+      logo: "/logos/oxford.png",
+      bullets: [
+        "Developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement",
+        "Implemented behavior cloning (BC) policies in complex and uncertain environments with more than 60 agents in each scenario",
       ],
     },
     {
