@@ -63,29 +63,29 @@ export const siteConfig = {
       ],
     },
   ],
-    projects: [
-          {
-      name: "Imitation Learning for AVs Inside World Models",
-      description:
-        "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios",
-      link: "https://github.com/SaeedRahmani",
-      skills: ["Python", "PyTorch", "World Models"],
-    },
-    {
-      name: "Simulation Agents for Mixed-Autonomy Traffic",
-      description:
-        "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles",
-      link: "https://github.com/SaeedRahmani",
-      skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
-    },
-    {
-      name: "Edge Case Detection for Autonomous Driving",
-      description:
-        "Foundation model-based system for detecting critical edge cases in autonomous driving systems (Hi-Drive Project)",
-      link: "https://hi-drive.eu",
-      skills: ["VLMs", "Deep Learning", "Python"],
-    },
-  ],
+  //   projects: [
+  //         {
+  //     name: "Imitation Learning for AVs Inside World Models",
+  //     description:
+  //       "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios",
+  //     link: "https://github.com/SaeedRahmani/Dream_Imitation_AVs",
+  //     skills: ["Python", "PyTorch", "World Models"],
+  //   },
+  //   {
+  //     name: "Simulation Agents for Mixed-Autonomy Traffic",
+  //     description:
+  //       "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles",
+  //     link: "https://github.com/SaeedRahmani/AV-Simulation-at-Intersections",
+  //     skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
+  //   },
+  //   {
+  //     name: "Edge Case Detection for Autonomous Driving",
+  //     description:
+  //       "Foundation model-based system for detecting critical edge cases in autonomous driving systems (Hi-Drive Project)",
+  //     link: "https://github.com/SaeedRahmani/edge_case_detection",
+  //     skills: ["VLMs", "Deep Learning", "Python"],
+  //   },
+  // ],
   education: [
     {
       school: "Oxford University, United Kingdom",

@@ -23,31 +23,60 @@ const conferencePubs = siteConfig.publications ? siteConfig.publications.filter(
           </div>
 
           <div class="lg:col-span-8">
-            <div class="mb-8">
-              <a
-                href={siteConfig.social.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 text-base sm:text-lg font-medium"
-                style={`color: ${siteConfig.accentColor}`}
-              >
-                View all publications on Google Scholar
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="transition-transform group-hover:translate-x-1"
-                >
-                  <path d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
-              </a>
-            </div>
+            <a
+              href={siteConfig.social.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group block mb-8 p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-full flex items-center justify-center"
+                       style={`background-color: ${siteConfig.accentColor}15`}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style={`color: ${siteConfig.accentColor}`}
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M10 6h-6a1 1 0 0 0 -1 1v11a1 1 0 0 0 1 1h11a1 1 0 0 0 1 -1v-6" />
+                      <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                      <path d="M16 4l3.5 3.5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-lg font-semibold text-gray-900">
+                      View all publications
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      on Google Scholar
+                    </div>
+                  </div>
+                </div>
+                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-900 text-white transition-all duration-300 group-hover:bg-gray-700">
+                  <svg
+                    class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 17L17 7M17 7H7M17 7V17"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </a>
 
             <div class="space-y-12">
               {/* Journal Publications */}
