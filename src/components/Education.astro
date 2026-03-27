@@ -5,56 +5,118 @@ const hasEducation = siteConfig.education && siteConfig.education.length > 0;
 
 {
   hasEducation && (
-    <section id="education" class="p-8 sm:p-12 md:p-16 lg:p-24">
+    <section id="education" class="p-6 sm:p-8 md:p-10 lg:p-14">
       <div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           <div class="lg:col-span-4">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-bold text-gray-900">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
               Education
             </h2>
             <div
               class="w-[75px] h-[5px] mt-2 rounded-full"
               style={`background-color: ${siteConfig.accentColor}`}
             />
+            <p class="text-xs text-gray-400 mt-3 italic">hover or tap to expand</p>
           </div>
 
-          <div class="lg:col-span-8">
-            <div class="space-y-8">
-              {siteConfig.education.map((edu) => (
-                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 hover:shadow-md transition-shadow duration-300">
-                  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
-                    <div>
-                      <h3 class="text-lg sm:text-xl font-semibold text-gray-900">
-                        {edu.degree}
-                      </h3>
-                      <p
-                        class="text-base sm:text-lg"
-                        style={`color: ${siteConfig.accentColor}`}
-                      >
-                        {edu.school}
-                      </p>
-                    </div>
-                    <span class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-0">
-                      {edu.dateRange}
+          <div class="lg:col-span-8 border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+            {siteConfig.education.map((edu) => (
+              <div class="edu-row bg-white">
+                <div class="flex items-center justify-between px-4 py-3 select-none">
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <span class="font-medium text-gray-900 text-sm truncate">
+                      {edu.school}
+                    </span>
+                    <span class="text-gray-300 flex-shrink-0 text-xs">·</span>
+                    <span class="text-gray-500 text-sm truncate hidden sm:block">
+                      {edu.degree}
                     </span>
                   </div>
+                  <div class="flex items-center gap-3 flex-shrink-0 ml-3">
+                    <span class="text-xs text-gray-400 hidden md:block">
+                      {edu.dateRange}
+                    </span>
+                    <svg
+                      class="edu-chevron w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
 
-                  <ul class="space-y-2">
+                <div class="edu-content px-4 pb-4 pt-1">
+                  <div class="flex items-center gap-2 mb-3 sm:hidden">
+                    <span class="text-xs text-gray-500 font-medium">{edu.degree}</span>
+                    <span class="text-gray-300 text-xs">·</span>
+                    <span class="text-xs text-gray-400">{edu.dateRange}</span>
+                  </div>
+                  <ul
+                    class="space-y-1.5 pl-3 border-l-2"
+                    style={`border-color: ${siteConfig.accentColor}50`}
+                  >
                     {edu.achievements.map((achievement) => (
-                      <li class="flex items-start">
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 mr-3 flex-shrink-0" />
-                        <span class="text-sm sm:text-base text-gray-600">
-                          {achievement}
-                        </span>
+                      <li class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                        {achievement}
                       </li>
                     ))}
                   </ul>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </section>
   )
 }
+
+<style>
+  .edu-row {
+    max-height: 52px;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+    cursor: pointer;
+  }
+
+  .edu-row:hover,
+  .edu-row.is-open {
+    max-height: 400px;
+  }
+
+  .edu-chevron {
+    transition: transform 0.3s ease;
+  }
+
+  .edu-row:hover .edu-chevron,
+  .edu-row.is-open .edu-chevron {
+    transform: rotate(180deg);
+  }
+
+  .edu-content {
+    opacity: 0;
+    transition: opacity 0.2s ease 0.15s;
+    pointer-events: none;
+  }
+
+  .edu-row:hover .edu-content,
+  .edu-row.is-open .edu-content {
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+
+<script>
+  document.querySelectorAll(".edu-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      row.classList.toggle("is-open");
+    });
+  });
+</script>
