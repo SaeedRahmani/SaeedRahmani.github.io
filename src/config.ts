@@ -1,6 +1,8 @@
 export const siteConfig = {
   name: "Saeed",
   title: "PhD Candidate | AI & Robotics",
+  // Find your ID at semanticscholar.org — search your name, click your profile, copy the number from the URL
+  semanticScholarId: "2325726503",
   description: "Portfolio website of Saeed Rahmani - PhD candidate specializing in Foundation Models, Reinforcement Learning, and Autonomous Systems",
   accentColor: "#1d4ed8",
   social: {

@@ -9,16 +9,24 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
 
 <header
   id="header"
-  class="fixed top-0 left-0 right-0 z-50 hidden md:block transition-all duration-300"
+  class="fixed top-0 left-0 right-0 z-50 block transition-all duration-300"
 >
-  <nav class="max-w-7xl mx-auto px-8 py-4">
-    <ul class="flex items-center gap-8 justify-center">
+  <nav class="max-w-7xl mx-auto px-4 md:px-8 py-3">
+    <ul class="flex items-center gap-4 md:gap-8 justify-center overflow-x-auto flex-nowrap scrollbar-hide">
       <li>
         <a
           href="#about"
-          class="text-gray-700 hover:text-black transition-colors font-medium"
+          class="text-gray-700 hover:text-black transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
         >
           About
+        </a>
+      </li>
+      <li>
+        <a
+          href="#news"
+          class="text-gray-700 hover:text-black transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
+        >
+          News
         </a>
       </li>
       {
@@ -26,7 +34,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
           <li>
             <a
               href="#projects"
-              class="text-gray-700 hover:text-black transition-colors font-medium"
+              class="text-gray-700 hover:text-black transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
             >
               Projects
             </a>
@@ -38,7 +46,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
           <li>
             <a
               href="#experience"
-              class="text-gray-700 hover:text-black transition-colors font-medium"
+              class="text-gray-700 hover:text-black transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
             >
               Experience
             </a>
@@ -50,7 +58,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
           <li>
             <a
               href="#education"
-              class="text-gray-700 hover:text-black transition-colors font-medium"
+              class="text-gray-700 hover:text-black transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
             >
               Education
             </a>
@@ -62,7 +70,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
           <li>
             <a
               href="#publications"
-              class="text-gray-700 hover:text-black transition-colors font-medium"
+              class="text-gray-700 hover:text-black transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
             >
               Publications
             </a>
@@ -88,4 +96,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
   html {
     scroll-behavior: smooth;
   }
+  /* hide scrollbar on mobile nav row */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>

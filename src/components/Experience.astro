@@ -5,10 +5,10 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
 
 {
   hasExperience && (
-    <section id="experience" class="p-6 sm:p-8 md:p-10 lg:p-14">
+    <section id="experience" class="px-6 py-8 lg:px-14 lg:py-10">
       <div>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
-          <div class="lg:col-span-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start">
+            <div class="lg:col-span-3">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
               Experience
             </h2>
@@ -19,7 +19,7 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
             <p class="text-xs text-gray-400 mt-3 italic">hover or tap to expand</p>
           </div>
 
-          <div class="lg:col-span-8 border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+          <div class="lg:col-span-9 border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
             {siteConfig.experience.map((exp) => (
               <div class="exp-row bg-white">
                 {/* Collapsed single-line header */}

@@ -14,10 +14,10 @@ const gradients: [string, string][] = [
 
 {
   hasProjects && (
-    <section id="projects" class="p-6 sm:p-8 md:p-10 lg:p-14">
+    <section id="projects" class="px-6 py-8 lg:px-14 lg:py-10">
       <div>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
-          <div class="lg:col-span-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start">
+          <div class="lg:col-span-3">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
               Projects
             </h2>
@@ -27,8 +27,8 @@ const gradients: [string, string][] = [
             />
           </div>
 
-          <div class="lg:col-span-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="lg:col-span-9">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {siteConfig.projects.map((project, index) => {
                 const Component = project.link ? "a" : "div";
                 const linkProps = project.link
