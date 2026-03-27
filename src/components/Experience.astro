@@ -34,9 +34,12 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
                   )}
 
                   {/* Experience card */}
-                  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 hover:shadow-md transition-shadow duration-300">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                        <div class="flex items-center gap-3">
+                  <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+                    <div class="flex flex-col md:flex-row gap-4">
+                      {/* Left side: Content */}
+                      <div class="flex-1 p-4 sm:p-5 md:p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                          <div class="flex items-center gap-3">
                           {exp.logo && (
                             <img src={exp.logo} alt={exp.company} class="w-18 h-18 object-contain rounded" />
                           )}
@@ -57,16 +60,35 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
                         </span>
                       </div>
 
-                    <ul class="space-y-2">
-                      {exp.bullets.map((bullet) => (
-                        <li class="flex items-start">
-                          <span class="inline-block w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 mr-3 flex-shrink-0" />
-                          <span class="text-sm sm:text-base text-gray-600">
-                            {bullet}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                        <ul class="space-y-2">
+                          {exp.bullets.map((bullet) => (
+                            <li class="flex items-start">
+                              <span class="inline-block w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 mr-3 flex-shrink-0" />
+                              <span class="text-sm sm:text-base text-gray-600">
+                                {bullet}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Right side: Images stacked vertically */}
+                      {exp.images && exp.images.length > 0 && (
+                        <div class="md:w-48 flex-shrink-0">
+                          <div class="flex flex-col gap-2 p-4">
+                            {exp.images.map((image) => (
+                              <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                <img
+                                  src={image}
+                                  alt=""
+                                  class="w-full h-full object-cover"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
