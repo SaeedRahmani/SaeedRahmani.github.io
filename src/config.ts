@@ -67,29 +67,65 @@ export const siteConfig = {
       ],
     },
   ],
-  //   projects: [
-  //         {
-  //     name: "Imitation Learning for AVs Inside World Models",
-  //     description:
-  //       "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios",
-  //     link: "https://github.com/SaeedRahmani/Dream_Imitation_AVs",
-  //     skills: ["Python", "PyTorch", "World Models"],
-  //   },
-  //   {
-  //     name: "Simulation Agents for Mixed-Autonomy Traffic",
-  //     description:
-  //       "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles",
-  //     link: "https://github.com/SaeedRahmani/AV-Simulation-at-Intersections",
-  //     skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
-  //   },
-  //   {
-  //     name: "Edge Case Detection for Autonomous Driving",
-  //     description:
-  //       "Foundation model-based system for detecting critical edge cases in autonomous driving systems (Hi-Drive Project)",
-  //     link: "https://github.com/SaeedRahmani/edge_case_detection",
-  //     skills: ["VLMs", "Deep Learning", "Python"],
-  //   },
-  // ],
+  projects: [
+    {
+      name: "Imitation Learning for AVs Inside World Models",
+      description:
+        "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios.",
+      link: "https://github.com/SaeedRahmani/Dream_Imitation_AVs",
+      skills: ["Python", "PyTorch", "World Models"],
+      emoji: "🌍",
+      image: "",
+    },
+    {
+      name: "Simulation Agents for Mixed-Autonomy Traffic",
+      description:
+        "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles.",
+      link: "https://github.com/SaeedRahmani/AV-Simulation-at-Intersections",
+      skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
+      emoji: "🚦",
+      image: "",
+    },
+    {
+      name: "Edge Case Detection for Autonomous Driving",
+      description:
+        "Foundation model-based system for detecting critical edge cases in autonomous driving systems (Hi-Drive Project).",
+      link: "https://github.com/SaeedRahmani/edge_case_detection",
+      skills: ["VLMs", "Deep Learning", "Python"],
+      emoji: "🔍",
+      image: "",
+    },
+  ],
+  news: [
+    {
+      date: "Oct. 2025",
+      html: `Started as a Research Intern at <strong>Toyota Motors Europe</strong>, Belgium, working on VLMs and Transformers for anomaly detection in autonomous driving.`,
+    },
+    {
+      date: "Aug. 2025",
+      html: `Joined <strong>Oxford University</strong> as an Exchange PhD student, working with Prof. Shimon Whiteson and Prof. Jakob Foerster on multi-agent reinforcement learning.`,
+    },
+    {
+      date: "Aug. 2025",
+      html: `Received the <strong>TU Delft TMI Collaborative Research Grant</strong> for 2025.`,
+    },
+    {
+      date: "2025",
+      html: `Paper accepted at <strong>IEEE IROS 2025</strong> on ethical decision-making in automated vehicles.`,
+    },
+    {
+      date: "Aug. 2024",
+      html: `Visited <strong>BMW Group</strong>, Germany as a Research Engineer for autonomous driving simulation and safety validation.`,
+    },
+    {
+      date: "2023",
+      html: `Awarded the <strong>Best Student Paper Runner-up Award</strong> at IEEE ITSC 2023, Spain.`,
+    },
+    {
+      date: "Jan. 2022",
+      html: `Started PhD at <strong>TU Delft</strong>, Netherlands, advised by Prof. Bart van Arem and Dr. Simeon C. Calvert.`,
+    },
+  ],
   education: [
     {
       school: "Oxford University, United Kingdom",
