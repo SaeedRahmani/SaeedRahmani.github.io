@@ -2,8 +2,10 @@
 import { siteConfig } from "../config";
 
 // ---------------------------------------------------------------------------
-// Fetch live data from Semantic Scholar at build time (free, no API key)
-// Falls back to config data if the request fails or no ID is configured
+// Strategy: config papers are authoritative (correct title/venue/awards).
+// Semantic Scholar adds any additional papers not already in config,
+// and enriches all papers with live citation counts.
+// Result: complete + accurate + auto-updated list.
 // ---------------------------------------------------------------------------
 type Pub = {
   title: string;
@@ -16,70 +18,66 @@ type Pub = {
   citationCount?: number;
 };
 
-let pubs: Pub[] = [];
-let fetchedLive = false;
+const key = (title: string) => title.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 40);
 
+// Start with config papers (authoritative)
+const configPubs: Pub[] = (siteConfig.publications ?? []).map((p) => ({
+  ...p,
+  type: p.type as "Journal" | "Conference",
+}));
+const configKeys = new Set(configPubs.map((p) => key(p.title)));
+
+// Fetch from Semantic Scholar: adds extra papers + citation counts
 if (siteConfig.semanticScholarId) {
   try {
     const res = await fetch(
       `https://api.semanticscholar.org/graph/v1/author/${siteConfig.semanticScholarId}/papers` +
-        `?fields=title,year,venue,authors,externalIds,citationCount,publicationTypes&limit=50`,
-      { signal: AbortSignal.timeout(6000) }
+        `?fields=title,year,venue,authors,externalIds,citationCount,publicationTypes&limit=100`,
+      { signal: AbortSignal.timeout(8000) }
     );
     if (res.ok) {
       const data = (await res.json()) as { data: any[] };
-      pubs = data.data
-        .filter((p) => p.title && p.year)
-        .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
-        .map((p) => {
-          const types: string[] = p.publicationTypes ?? [];
-          const isJournal = types.some((t: string) =>
-            ["JournalArticle", "Review"].includes(t)
-          );
-          const doi = p.externalIds?.DOI;
-          const arxiv = p.externalIds?.ArXiv;
-          return {
-            title: p.title as string,
-            year: String(p.year),
-            authors: (p.authors as { name: string }[])
-              .map((a) => a.name)
-              .join(", "),
-            venue: (p.venue as string) ?? "",
-            type: isJournal ? "Journal" : "Conference",
-            link: doi
-              ? `https://doi.org/${doi}`
-              : arxiv
-                ? `https://arxiv.org/abs/${arxiv}`
-                : `https://www.semanticscholar.org/paper/${p.paperId}`,
-            citationCount: p.citationCount as number,
-          } satisfies Pub;
+
+      for (const p of data.data) {
+        if (!p.title || !p.year) continue;
+        const pKey = key(p.title);
+
+        // Enrich existing config paper with citation count
+        const existing = configPubs.find((c) => key(c.title) === pKey);
+        if (existing) {
+          if (p.citationCount > 0) existing.citationCount = p.citationCount;
+          continue;
+        }
+
+        // New paper not in config — add it from Semantic Scholar
+        const types: string[] = p.publicationTypes ?? [];
+        const isJournal = types.some((t: string) => ["JournalArticle", "Review"].includes(t));
+        const doi = p.externalIds?.DOI;
+        const arxiv = p.externalIds?.ArXiv;
+        configPubs.push({
+          title: p.title,
+          year: String(p.year),
+          authors: (p.authors as { name: string }[]).map((a) => a.name).join(", "),
+          venue: p.venue ?? "",
+          type: isJournal ? "Journal" : "Conference",
+          link: doi
+            ? `https://doi.org/${doi}`
+            : arxiv
+              ? `https://arxiv.org/abs/${arxiv}`
+              : `https://www.semanticscholar.org/paper/${p.paperId}`,
+          citationCount: p.citationCount > 0 ? p.citationCount : undefined,
         });
-      fetchedLive = true;
+      }
     }
   } catch {
-    // silently fall back to config
+    // best-effort — config papers still show
   }
 }
 
-if (!fetchedLive) {
-  pubs = (siteConfig.publications ?? []).map((p) => ({
-    ...p,
-    type: p.type as "Journal" | "Conference",
-  }));
-}
-
-// pubs is already sorted by year desc from the fetch above
+// Sort all by year descending
+const pubs = configPubs.sort((a, b) => Number(b.year) - Number(a.year));
 const hasPublications = pubs.length > 0;
-const PREVIEW = 10;
-
-// Preserve any manually configured awards by matching on title substring
-const awardMap = new Map(
-  (siteConfig.publications ?? [])
-    .filter((p) => p.award)
-    .map((p) => [p.title.toLowerCase().slice(0, 30), p.award])
-);
-const getAward = (title: string) =>
-  awardMap.get(title.toLowerCase().slice(0, 30));
+const PREVIEW = 7;
 ---
 
 {
@@ -95,12 +93,9 @@ const getAward = (title: string) =>
               class="w-[75px] h-[5px] mt-2 rounded-full"
               style={`background-color: ${siteConfig.accentColor}`}
             />
-            {fetchedLive && (
-              <p class="mt-2 text-xs text-gray-400 italic">auto-synced</p>
-            )}
           </div>
 
-          <div class="lg:col-span-9 space-y-4">
+          <div class="lg:col-span-9 space-y-3">
 
             {/* Google Scholar card */}
             <a
@@ -119,7 +114,9 @@ const getAward = (title: string) =>
                   </svg>
                 </div>
                 <div>
-                  <p class="text-sm font-semibold text-gray-900 group-hover:underline underline-offset-2">View full publication list</p>
+                  <p class="text-sm font-semibold text-gray-900 group-hover:underline underline-offset-2">
+                    View full publication list
+                  </p>
                   <p class="text-xs text-gray-400">Google Scholar profile</p>
                 </div>
               </div>
@@ -128,102 +125,101 @@ const getAward = (title: string) =>
               </svg>
             </a>
 
-{/* Publication rows — first PREVIEW always visible, rest in collapsible container */}
-            <div class="pub-list border border-gray-200 rounded-xl overflow-hidden">
-              {/* Always-visible rows */}
-              <div class="divide-y divide-gray-100">
-                {pubs.slice(0, PREVIEW).map((pub) => {
-                  const award = getAward(pub.title) ?? pub.award;
-                  return (
-                    <div class="bg-white">
-                      <div class="flex items-center gap-2 flex-wrap px-4 py-3">
-                        <span class="text-xs font-mono text-gray-400 flex-shrink-0 w-8">
-                          {pub.year}
-                        </span>
-                        <span class="flex-1 min-w-0">
-                          <a
-                            href={pub.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-sm font-medium text-gray-900 hover:underline underline-offset-2 leading-snug"
-                          >
-                            {pub.title}
-                          </a>
-                          {pub.venue && <span class="ml-1.5 text-xs text-gray-400 italic">{pub.venue}</span>}
-                        </span>
-                        <div class="flex items-center gap-1.5 flex-shrink-0">
-                          {award && (
-                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
-                              🏆 {award}
-                            </span>
-                          )}
-                          <span
-                            class="text-xs px-1.5 py-0.5 rounded font-medium"
-                            style={`background-color: ${siteConfig.accentColor}15; color: ${siteConfig.accentColor}`}
-                          >
-                            {pub.type === "Journal" ? "J" : "C"}
+            {/* Publication list */}
+            <div class="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+              {pubs.slice(0, PREVIEW).map((pub) => (
+                <div class="bg-white flex items-start gap-2 px-4 py-3">
+                  <span class="text-xs font-mono text-gray-400 flex-shrink-0 pt-0.5 w-8">
+                    {pub.year}
+                  </span>
+                  <span class="flex-1 min-w-0">
+                    <a
+                      href={pub.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-sm font-medium text-gray-900 hover:underline underline-offset-2 leading-snug"
+                    >
+                      {pub.title}
+                    </a>
+                    {pub.venue && (
+                      <span class="block text-xs text-gray-400 italic mt-0.5">{pub.venue}</span>
+                    )}
+                  </span>
+                  <div class="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
+                    {pub.award && (
+                      <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
+                        🏆
+                      </span>
+                    )}
+                    <span
+                      class="text-xs px-1.5 py-0.5 rounded font-medium"
+                      style={`background-color: ${siteConfig.accentColor}15; color: ${siteConfig.accentColor}`}
+                    >
+                      {pub.type === "Journal" ? "J" : "C"}
+                    </span>
+                    {pub.citationCount !== undefined && pub.citationCount > 0 && (
+                      <span class="text-xs text-gray-400">{pub.citationCount}×</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Collapsible extra rows */}
+              {pubs.length > PREVIEW && (
+                <div id="pub-extras" class="divide-y divide-gray-100 hidden">
+                  {pubs.slice(PREVIEW).map((pub) => (
+                    <div class="bg-white flex items-start gap-2 px-4 py-3">
+                      <span class="text-xs font-mono text-gray-400 flex-shrink-0 pt-0.5 w-8">
+                        {pub.year}
+                      </span>
+                      <span class="flex-1 min-w-0">
+                        <a
+                          href={pub.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-sm font-medium text-gray-900 hover:underline underline-offset-2 leading-snug"
+                        >
+                          {pub.title}
+                        </a>
+                        {pub.venue && (
+                          <span class="block text-xs text-gray-400 italic mt-0.5">{pub.venue}</span>
+                        )}
+                      </span>
+                      <div class="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
+                        {pub.award && (
+                          <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
+                            🏆
                           </span>
-                          {pub.citationCount !== undefined && pub.citationCount > 0 && (
-                            <span class="text-xs text-gray-400">{pub.citationCount}×</span>
-                          )}
-                        </div>
+                        )}
+                        <span
+                          class="text-xs px-1.5 py-0.5 rounded font-medium"
+                          style={`background-color: ${siteConfig.accentColor}15; color: ${siteConfig.accentColor}`}
+                        >
+                          {pub.type === "Journal" ? "J" : "C"}
+                        </span>
+                        {pub.citationCount !== undefined && pub.citationCount > 0 && (
+                          <span class="text-xs text-gray-400">{pub.citationCount}×</span>
+                        )}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Hidden extra rows — single container that expands on hover */}
-              {pubs.length > PREVIEW && (
-                <div class="pub-extras border-t border-gray-100 divide-y divide-gray-100">
-                  {pubs.slice(PREVIEW).map((pub) => {
-                    const award = getAward(pub.title) ?? pub.award;
-                    return (
-                      <div class="bg-white">
-                        <div class="flex items-center gap-2 flex-wrap px-4 py-3">
-                          <span class="text-xs font-mono text-gray-400 flex-shrink-0 w-8">
-                            {pub.year}
-                          </span>
-                          <span class="flex-1 min-w-0">
-                            <a
-                              href={pub.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="text-sm font-medium text-gray-900 hover:underline underline-offset-2 leading-snug"
-                            >
-                              {pub.title}
-                            </a>
-                            {pub.venue && <span class="ml-1.5 text-xs text-gray-400 italic">{pub.venue}</span>}
-                          </span>
-                          <div class="flex items-center gap-1.5 flex-shrink-0">
-                            {award && (
-                              <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
-                                🏆 {award}
-                              </span>
-                            )}
-                            <span
-                              class="text-xs px-1.5 py-0.5 rounded font-medium"
-                              style={`background-color: ${siteConfig.accentColor}15; color: ${siteConfig.accentColor}`}
-                            >
-                              {pub.type === "Journal" ? "J" : "C"}
-                            </span>
-                            {pub.citationCount !== undefined && pub.citationCount > 0 && (
-                              <span class="text-xs text-gray-400">{pub.citationCount}×</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  ))}
                 </div>
               )}
             </div>
 
+            {/* Show more / less toggle button */}
             {pubs.length > PREVIEW && (
-              <p class="text-xs text-gray-400 italic text-right">
-                Hover the list to see all {pubs.length} publications
-              </p>
+              <button
+                id="pub-toggle"
+                class="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors duration-150 bg-white"
+              >
+                <span id="pub-toggle-label">Show {pubs.length - PREVIEW} more</span>
+                <svg id="pub-toggle-chevron" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             )}
+
           </div>
         </div>
       </div>
@@ -231,14 +227,19 @@ const getAward = (title: string) =>
   )
 }
 
-<style>
-  .pub-extras {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.6s ease;
-  }
+<script>
+  const toggle = document.getElementById("pub-toggle");
+  const extras = document.getElementById("pub-extras");
+  const label = document.getElementById("pub-toggle-label");
+  const chevron = document.getElementById("pub-toggle-chevron");
 
-  .pub-list:hover .pub-extras {
-    max-height: 9999px;
+  if (toggle && extras && label && chevron) {
+    const moreCount = extras.children.length;
+    toggle.addEventListener("click", () => {
+      const isHidden = extras.classList.contains("hidden");
+      extras.classList.toggle("hidden", !isHidden);
+      label.textContent = isHidden ? "Show less" : `Show ${moreCount} more`;
+      chevron.style.transform = isHidden ? "rotate(180deg)" : "";
+    });
   }
-</style>
+</script>
