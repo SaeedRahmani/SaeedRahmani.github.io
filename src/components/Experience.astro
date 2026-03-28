@@ -16,14 +16,14 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
               class="w-[75px] h-[5px] mt-2 rounded-full"
               style={`background-color: ${siteConfig.accentColor}`}
             />
-            <p class="text-xs text-gray-400 mt-3 italic">hover or tap to expand</p>
+
           </div>
 
           <div class="lg:col-span-9 border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
             {siteConfig.experience.map((exp) => (
-              <div class="exp-row bg-white">
-                {/* Collapsed single-line header */}
-                <div class="flex items-center justify-between px-4 py-3 select-none">
+              <div class="bg-white px-4 py-4">
+                {/* Header row */}
+                <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center gap-3 min-w-0 flex-1">
                     {exp.logo && (
                       <img
@@ -36,48 +36,26 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
                       {exp.company}
                     </span>
                     <span class="text-gray-300 flex-shrink-0 text-xs">·</span>
-                    <span class="text-gray-500 text-sm truncate hidden sm:block">
+                    <span class="text-gray-500 text-sm truncate">
                       {exp.title}
                     </span>
                   </div>
-                  <div class="flex items-center gap-3 flex-shrink-0 ml-3">
-                    <span class="text-xs text-gray-400 hidden md:block">
-                      {exp.dateRange}
-                    </span>
-                    <svg
-                      class="chevron w-3.5 h-3.5 text-gray-400 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
+                  <span class="text-xs text-gray-400 flex-shrink-0 ml-3">
+                    {exp.dateRange}
+                  </span>
                 </div>
 
-                {/* Expanded content */}
-                <div class="exp-content px-4 pb-4 pt-1">
-                  <div class="flex items-center gap-2 mb-3 sm:hidden">
-                    <span class="text-xs text-gray-500 font-medium">{exp.title}</span>
-                    <span class="text-gray-300 text-xs">·</span>
-                    <span class="text-xs text-gray-400">{exp.dateRange}</span>
-                  </div>
-                  <ul
-                    class="space-y-2 pl-3 border-l-2"
-                    style={`border-color: ${siteConfig.accentColor}50`}
-                  >
-                    {exp.bullets.map((bullet) => (
-                      <li class="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                        {bullet}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {/* Bullets always visible */}
+                <ul
+                  class="space-y-2 pl-3 border-l-2"
+                  style={`border-color: ${siteConfig.accentColor}50`}
+                >
+                  {exp.bullets.map((bullet) => (
+                    <li class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -87,45 +65,4 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
   )
 }
 
-<style>
-  .exp-row {
-    max-height: 52px;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in-out;
-    cursor: pointer;
-  }
 
-  .exp-row:hover,
-  .exp-row.is-open {
-    max-height: 500px;
-  }
-
-  .chevron {
-    transition: transform 0.3s ease;
-  }
-
-  .exp-row:hover .chevron,
-  .exp-row.is-open .chevron {
-    transform: rotate(180deg);
-  }
-
-  .exp-content {
-    opacity: 0;
-    transition: opacity 0.2s ease 0.15s;
-    pointer-events: none;
-  }
-
-  .exp-row:hover .exp-content,
-  .exp-row.is-open .exp-content {
-    opacity: 1;
-    pointer-events: auto;
-  }
-</style>
-
-<script>
-  document.querySelectorAll(".exp-row").forEach((row) => {
-    row.addEventListener("click", () => {
-      row.classList.toggle("is-open");
-    });
-  });
-</script>
