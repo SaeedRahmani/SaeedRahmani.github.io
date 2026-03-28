@@ -145,22 +145,11 @@ const PREVIEW = 7;
                       <span class="block text-xs text-gray-400 italic mt-0.5">{pub.venue}</span>
                     )}
                   </span>
-                  <div class="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
-                    {pub.award && (
-                      <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
-                        🏆
-                      </span>
-                    )}
-                    <span
-                      class="text-xs px-1.5 py-0.5 rounded font-medium"
-                      style={`background-color: ${siteConfig.accentColor}15; color: ${siteConfig.accentColor}`}
-                    >
-                      {pub.type === "Journal" ? "J" : "C"}
+                  {pub.award && (
+                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200 flex-shrink-0 mt-0.5">
+                      🏆
                     </span>
-                    {pub.citationCount !== undefined && pub.citationCount > 0 && (
-                      <span class="text-xs text-gray-400">{pub.citationCount}×</span>
-                    )}
-                  </div>
+                  )}
                 </div>
               ))}
 
@@ -185,22 +174,11 @@ const PREVIEW = 7;
                           <span class="block text-xs text-gray-400 italic mt-0.5">{pub.venue}</span>
                         )}
                       </span>
-                      <div class="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
-                        {pub.award && (
-                          <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
-                            🏆
-                          </span>
-                        )}
-                        <span
-                          class="text-xs px-1.5 py-0.5 rounded font-medium"
-                          style={`background-color: ${siteConfig.accentColor}15; color: ${siteConfig.accentColor}`}
-                        >
-                          {pub.type === "Journal" ? "J" : "C"}
+                      {pub.award && (
+                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200 flex-shrink-0 mt-0.5">
+                          🏆
                         </span>
-                        {pub.citationCount !== undefined && pub.citationCount > 0 && (
-                          <span class="text-xs text-gray-400">{pub.citationCount}×</span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>
