@@ -101,7 +101,7 @@
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(CX - RW/2, 0); ctx.lineTo(CX - RW/2, CY - RW/2);
@@ -117,7 +117,7 @@
     ctx.moveTo(CX + RW/2, CY + RW/2); ctx.lineTo(W, CY + RW/2);
     ctx.stroke();
 
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
     ctx.setLineDash([16, 24]);
     ctx.beginPath();
     ctx.moveTo(CX, 0); ctx.lineTo(CX, CY - RW/2);
@@ -127,7 +127,7 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(CX, CY + RW/2 + 25); ctx.lineTo(CX + RW/2, CY + RW/2 + 25);
@@ -137,9 +137,9 @@
     for (let c of cvs) {
       ctx.beginPath();
       ctx.roundRect(c.x - c.len/2, c.y - c.wid/2, c.len, c.wid, 4);
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillStyle = 'rgba(0,0,0,0.06)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
       ctx.stroke();
     }
 
