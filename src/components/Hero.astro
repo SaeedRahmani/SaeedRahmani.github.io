@@ -467,7 +467,8 @@ const interactiveBg: string = 'point-cloud';
       ctx.beginPath();
       const CX = vw / 2;
       const CY = vh / 2;
-      const RW = 162; 
+      const SCALE = vw < 640 ? 0.6 : 1;
+      const RW = 162 * SCALE; 
       ctx.rect(CX - RW/2, 0, RW, vh);         // Vertical road segment
       ctx.rect(0, CY - RW/2, vw, RW);         // Horizontal road segment
       ctx.fill();

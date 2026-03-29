@@ -11,6 +11,8 @@
   const ctx = canvas.getContext('2d');
 
   let W, H, CX, CY;
+  let SCALE = 1;
+  let RW = 160;
 
   function resize() {
     W = canvas.parentElement.clientWidth || window.innerWidth;
@@ -19,6 +21,8 @@
     canvas.height = H;
     CX = W / 2;
     CY = H / 2;
+    SCALE = W < 640 ? 0.6 : 1;
+    RW = 160 * SCALE;
     if (ego && ego.y > H + 100) ego.y = -200;
   }
   
@@ -35,15 +39,14 @@
   const [ar,ag,ab] = hx(ACCENT);
   const rgba = a => `rgba(${ar},${ag},${ab},${a})`;
 
-  const RW = 160; 
   let ego = { x: 0, y: 0, spd: 0, state: 'approach' };
   let cvs = [];
 
   function spawnCrossVehicles() {
     cvs = [
-      { x: CX - 600, y: CY + RW/4, len: 44, wid: 20, spd: 3.5 },
-      { x: CX + 400, y: CY - RW/4, len: 44, wid: 20, spd: -2.8 },
-      { x: CX - 100, y: CY + RW/4, len: 44, wid: 20, spd: 3.2 },
+      { x: CX - 600 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, spd: 3.5 * SCALE },
+      { x: CX + 400 * SCALE, y: CY - RW/4, len: 44 * SCALE, wid: 20 * SCALE, spd: -2.8 * SCALE },
+      { x: CX - 100 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, spd: 3.2 * SCALE },
     ];
   }
 
@@ -130,13 +133,13 @@
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(CX - RW/2, CY - RW/2 - 25); ctx.lineTo(CX, CY - RW/2 - 25);
+    ctx.moveTo(CX - RW/2, CY - RW/2 - 25 * SCALE); ctx.lineTo(CX, CY - RW/2 - 25 * SCALE);
     ctx.stroke();
 
     ctx.lineWidth = 1;
     for (let c of cvs) {
       ctx.beginPath();
-      ctx.roundRect(c.x - c.len/2, c.y - c.wid/2, c.len, c.wid, 4);
+      ctx.roundRect(c.x - c.len/2, c.y - c.wid/2, c.len, c.wid, 4 * SCALE);
       ctx.fillStyle = 'rgba(0,0,0,0.06)';
       ctx.fill();
       ctx.strokeStyle = 'rgba(0,0,0,0.4)';
@@ -147,7 +150,7 @@
     ctx.shadowColor = rgba(0.6);
     ctx.shadowBlur = 15;
     ctx.beginPath();
-    ctx.roundRect(ego.x - 10, ego.y - 18, 20, 36, 4);
+    ctx.roundRect(ego.x - 10 * SCALE, ego.y - 18 * SCALE, 20 * SCALE, 36 * SCALE, 4 * SCALE);
     ctx.fill();
     ctx.shadowBlur = 0;
 
@@ -187,31 +190,31 @@
   }
 
   function update() {
-    const STOP_LINE = CY - RW/2 - 25;
+    const STOP_LINE = CY - RW/2 - 25 * SCALE;
     ego.x = CX - RW/4;
     
-    let danger = cvs.some(c => c.x > CX - RW/2 - 80 && c.x < CX + RW/2 + 80);
+    let danger = cvs.some(c => c.x > CX - RW/2 - 80 * SCALE && c.x < CX + RW/2 + 80 * SCALE);
 
     if (ego.state === 'approach') {
       let dist = STOP_LINE - ego.y;
-      if (dist < 180 && dist > 0 && danger) {
+      if (dist < 180 * SCALE && dist > 0 && danger) {
         ego.state = 'stopping';
       } else if (dist <= 0) {
         if (danger) { ego.state = 'wait'; ego.spd = 0; }
         else ego.state = 'cross';
       }
-      ego.spd += (3.5 - ego.spd) * 0.04;
+      ego.spd += (3.5 * SCALE - ego.spd) * 0.04;
     } else if (ego.state === 'stopping') {
       let dist = STOP_LINE - ego.y;
-      ego.spd = Math.min(ego.spd, Math.max(dist * 0.05, 0.5));
-      if (dist <= 2) { ego.y = STOP_LINE; ego.spd = 0; ego.state = 'wait'; }
+      ego.spd = Math.min(ego.spd, Math.max(dist * 0.05, 0.5 * SCALE));
+      if (dist <= 2 * SCALE) { ego.y = STOP_LINE; ego.spd = 0; ego.state = 'wait'; }
     } else if (ego.state === 'wait') {
       ego.spd = 0;
       if (!danger) ego.state = 'cross';
     } else if (ego.state === 'cross') {
-      ego.spd += (4.5 - ego.spd) * 0.06;
-      if (ego.y > H + 150) {
-        ego.y = -300;
+      ego.spd += (4.5 * SCALE - ego.spd) * 0.06;
+      if (ego.y > H + 150 * SCALE) {
+        ego.y = -300 * SCALE;
         ego.state = 'approach';
         spawnCrossVehicles();
       }
@@ -220,8 +223,8 @@
 
     for (let c of cvs) {
       c.x += c.spd;
-      if (c.spd > 0 && c.x > W + 400) c.x = -200;
-      if (c.spd < 0 && c.x < -400) c.x = W + 200;
+      if (c.spd > 0 && c.x > W + 400 * SCALE) c.x = -200 * SCALE;
+      if (c.spd < 0 && c.x < -400 * SCALE) c.x = W + 200 * SCALE;
     }
 
     const prev = sweep;
@@ -244,7 +247,7 @@
   }
 
   resize();
-  ego.y = -300;
+  ego.y = -300 * SCALE;
   spawnCrossVehicles();
   frame();
   setTimeout(() => { canvas.style.opacity = '1'; }, 300);
