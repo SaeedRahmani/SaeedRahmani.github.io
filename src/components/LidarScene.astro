@@ -15,6 +15,10 @@
   let RW = 160;
 
   function resize() {
+    let oldCX = CX;
+    let oldCY = CY;
+    let oldScale = SCALE;
+
     W = canvas.parentElement.clientWidth || window.innerWidth;
     H = canvas.parentElement.clientHeight || window.innerHeight;
     canvas.width = W;
@@ -23,7 +27,27 @@
     CY = H / 2;
     SCALE = W < 640 ? 0.6 : 1;
     RW = 160 * SCALE;
-    if (ego && ego.y > H + 100) ego.y = -200;
+
+    if (oldCX !== undefined && cvs && cvs.length > 0) {
+      if (oldScale !== SCALE) {
+        spawnCrossVehicles();
+        if (ego) {
+          ego.y = -300 * SCALE;
+          ego.state = 'approach';
+          ego.spd = 0;
+        }
+      } else {
+        let dx = CX - oldCX;
+        let dy = CY - oldCY;
+        for (let c of cvs) {
+          c.x += dx;
+          c.y += dy;
+        }
+        if (ego) ego.y += dy;
+      }
+    }
+
+    if (ego && ego.y > H + 100 * SCALE) ego.y = -300 * SCALE;
   }
   
   window.addEventListener('resize', resize);
