@@ -66,11 +66,41 @@
   let ego = { x: 0, y: 0, spd: 0, state: 'approach' };
   let cvs = [];
 
+  const mouse = { x: -1000, y: -1000, active: false };
+
+  function setupMouse() {
+    const handleMove = e => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      let cx = e.clientX;
+      let cy = e.clientY;
+      if (e.touches && e.touches.length > 0) {
+          cx = e.touches[0].clientX;
+          cy = e.touches[0].clientY;
+      }
+      if (cx === undefined || cy === undefined) return;
+      const x = cx - rect.left;
+      const y = cy - rect.top;
+      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+          mouse.x = x;
+          mouse.y = y;
+          mouse.active = true;
+      } else {
+          mouse.active = false;
+      }
+    };
+    window.addEventListener('mousemove', handleMove, {passive: true});
+    window.addEventListener('touchmove', handleMove, {passive: true});
+    window.addEventListener('touchstart', handleMove, {passive: true});
+    window.addEventListener('touchend', () => { mouse.active = false; });
+  }
+  setupMouse();
+
   function spawnCrossVehicles() {
     cvs = [
-      { x: CX - 600 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, spd: 3.5 * SCALE },
-      { x: CX + 400 * SCALE, y: CY - RW/4, len: 44 * SCALE, wid: 20 * SCALE, spd: -2.8 * SCALE },
-      { x: CX - 100 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, spd: 3.2 * SCALE },
+      { x: CX - 600 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, baseSpd: 3.5 * SCALE, spd: 3.5 * SCALE },
+      { x: CX + 400 * SCALE, y: CY - RW/4, len: 44 * SCALE, wid: 20 * SCALE, baseSpd: -2.8 * SCALE, spd: -2.8 * SCALE },
+      { x: CX - 100 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, baseSpd: 3.2 * SCALE, spd: 3.2 * SCALE },
     ];
   }
 
@@ -219,6 +249,18 @@
     
     let danger = cvs.some(c => c.x > CX - RW/2 - 80 * SCALE && c.x < CX + RW/2 + 80 * SCALE);
 
+    let egoBlocked = false;
+    if (mouse.active) {
+        let dy = mouse.y - ego.y;
+        let dx = Math.abs(mouse.x - ego.x);
+        if (dy > -20 && dy < 250 * SCALE && dx < 80 * SCALE) egoBlocked = true;
+    }
+    for (let c of cvs) {
+        let dx = Math.abs(c.x - ego.x);
+        let dy = c.y - ego.y;
+        if (dx < (c.len/2 + 25 * SCALE) && dy > 0 && dy < 110 * SCALE) egoBlocked = true;
+    }
+
     if (ego.state === 'approach') {
       let dist = STOP_LINE - ego.y;
       if (dist < 180 * SCALE && dist > 0 && danger) {
@@ -230,10 +272,15 @@
       ego.spd += (3.5 * SCALE - ego.spd) * 0.04;
     } else if (ego.state === 'stopping') {
       let dist = STOP_LINE - ego.y;
-      ego.spd = Math.min(ego.spd, Math.max(dist * 0.05, 0.5 * SCALE));
+      let targetSpd = Math.max(dist * 0.05, 0.5 * SCALE);
+      if (ego.spd < targetSpd) {
+          ego.spd += (targetSpd - ego.spd) * 0.1;
+      } else {
+          ego.spd = targetSpd;
+      }
       if (dist <= 2 * SCALE) { ego.y = STOP_LINE; ego.spd = 0; ego.state = 'wait'; }
     } else if (ego.state === 'wait') {
-      ego.spd = 0;
+      ego.spd += (0 - ego.spd) * 0.2;
       if (!danger) ego.state = 'cross';
     } else if (ego.state === 'cross') {
       ego.spd += (4.5 * SCALE - ego.spd) * 0.06;
@@ -243,12 +290,49 @@
         spawnCrossVehicles();
       }
     }
+    
+    if (egoBlocked) {
+        ego.spd += (0 - ego.spd) * 0.2;
+    }
     ego.y += ego.spd;
 
-    for (let c of cvs) {
+    for (let i = 0; i < cvs.length; i++) {
+      let c = cvs[i];
+      let blocked = false;
+      let dir = c.baseSpd > 0 ? 1 : -1;
+
+      if (mouse.active) {
+          let dx = mouse.x - c.x;
+          let dy = Math.abs(mouse.y - c.y);
+          if (dy < 120 * SCALE) {
+              if (dir === 1 && dx > 0 && dx < 250 * SCALE) blocked = true;
+              if (dir === -1 && dx < 0 && dx > -250 * SCALE) blocked = true;
+          }
+      }
+      
+      for (let j = 0; j < cvs.length; j++) {
+          if (i === j) continue;
+          let other = cvs[j];
+          let otherDir = other.baseSpd > 0 ? 1 : -1;
+          if (dir === otherDir) {
+              let dx = other.x - c.x;
+              if (dir === 1 && dx > 0 && dx < 120 * SCALE) blocked = true;
+              if (dir === -1 && dx < 0 && dx > -120 * SCALE) blocked = true;
+          }
+      }
+      
+      if (Math.abs(ego.y - c.y) < 60 * SCALE) {
+          let ex = ego.x - c.x;
+          if (dir === 1 && ex > 0 && ex < (ego.spd > 0.5 ? 120 : 60) * SCALE) blocked = true;
+          if (dir === -1 && ex < 0 && ex > -(ego.spd > 0.5 ? 120 : 60) * SCALE) blocked = true;
+      }
+
+      let target = blocked ? 0 : c.baseSpd;
+      c.spd += (target - c.spd) * 0.1;
       c.x += c.spd;
-      if (c.spd > 0 && c.x > W + 400 * SCALE) c.x = -200 * SCALE;
-      if (c.spd < 0 && c.x < -400 * SCALE) c.x = W + 200 * SCALE;
+
+      if (dir === 1 && c.x > W + 400 * SCALE) c.x = -200 * SCALE;
+      if (dir === -1 && c.x < -400 * SCALE) c.x = W + 200 * SCALE;
     }
 
     const prev = sweep;
