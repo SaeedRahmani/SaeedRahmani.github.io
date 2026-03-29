@@ -8,7 +8,7 @@ import LidarScene from "./LidarScene.astro";
 const activeViz: string = 'lidar';
 
 // ↓ Change this to swap the interactive background: 'network' | 'point-cloud'
-const interactiveBg: string = 'point-cloud';
+const interactiveBg: string = 'network';
 ---
 
 <div
@@ -323,6 +323,7 @@ const interactiveBg: string = 'point-cloud';
     if (!hero || !canvas) return;
 
     const ctx = canvas.getContext('2d'); if (!ctx) return;
+    const bgType = hero.dataset.bgType || 'point-cloud';
 
     // Accent color -> rgb
     const accent = getComputedStyle(hero).getPropertyValue('--accent-color').trim();
@@ -332,158 +333,244 @@ const interactiveBg: string = 'point-cloud';
       return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
     })(accent);
 
-    // Settings
     let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     let vw = 0, vh = 0;
-    let dots = [];
-    const GRID_SIZE = 35; // Spacing between dots
-
-    // Cursor interaction
-    const mouse = { x: -9999, y: -9999, inside: false };
-    const interactionRadius = 160;
-    const forceFactor = 2.0;
-
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let running = true;
+    document.addEventListener('visibilitychange', () => { running = document.visibilityState === 'visible'; });
 
-    function resize() {
-      const rect = hero.getBoundingClientRect();
-      vw = Math.max(1, Math.floor(rect.width));
-      vh = Math.max(1, Math.floor(rect.height));
-      canvas.width = Math.floor(vw * dpr);
-      canvas.height = Math.floor(vh * dpr);
-      canvas.style.width = vw + 'px';
-      canvas.style.height = vh + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      initDots();
-    }
-
-    function initDots() {
-      dots = [];
-      const cols = Math.ceil(vw / GRID_SIZE) + 1;
-      const rows = Math.ceil(vh / GRID_SIZE) + 1;
-      
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          const baseX = i * GRID_SIZE;
-          const baseY = j * GRID_SIZE;
-          dots.push({
-            baseX: baseX, baseY: baseY,
-            x: baseX, y: baseY,
-            vx: 0, vy: 0,
-            baseRadius: 1.2,
-          });
-        }
-      }
-    }
-
+    const mouse = { x: -9999, y: -9999, inside: false };
     hero.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
       mouse.inside = true;
     }, { passive: true });
-
     hero.addEventListener('mouseleave', () => {
       mouse.inside = false;
       mouse.x = -9999;
       mouse.y = -9999;
     });
 
-    let running = true;
-    document.addEventListener('visibilitychange', () => { running = document.visibilityState === 'visible'; });
+    if (bgType === 'network') {
+      let nodes = [];
+      let maxDist = 0;
+      let nodeCount = 0;
+      
+      const repelRadius = () => Math.max(90, Math.min(220, Math.sqrt(vw * vh) / 5.5));
+      const repelStrength = 0.65;
+      const swirlStrength = 0.12;
 
-    function updateDot(d) {
-      // Repulsion from mouse
-      if (mouse.inside) {
-        const dx = d.x - mouse.x;
-        const dy = d.y - mouse.y;
-        const dist = Math.hypot(dx, dy);
-        
-        if (dist < interactionRadius && dist > 0.1) {
-          const force = (interactionRadius - dist) / interactionRadius;
-          const pushX = (dx / dist) * force * forceFactor;
-          const pushY = (dy / dist) * force * forceFactor;
-          d.vx += pushX;
-          d.vy += pushY;
-        }
+      function configure() {
+        const target = Math.floor((vw * vh) / 16000);
+        nodeCount = Math.max(60, Math.min(240, target));
+        maxDist = Math.max(80, Math.min(220, Math.sqrt(vw * vh) / 6));
+        if (nodes.length > nodeCount) nodes.length = nodeCount;
+        else while (nodes.length < nodeCount) nodes.push(makeNode());
       }
-      
-      // Spring back to base position
-      const springK = 0.08;
-      const friction = 0.82;
-      
-      const homeX = d.baseX - d.x;
-      const homeY = d.baseY - d.y;
-      
-      d.vx += homeX * springK;
-      d.vy += homeY * springK;
-      
-      d.vx *= friction;
-      d.vy *= friction;
-      
-      d.x += d.vx;
-      d.y += d.vy;
-    }
+      function rand(min, max) { return min + Math.random() * (max - min); }
+      function makeNode() {
+        const speed = rand(0.2, 0.6);
+        const angle = rand(0, Math.PI * 2);
+        return {
+          x: rand(0, vw), y: rand(0, vh),
+          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+          drift: rand(0.001, 0.004), phase: rand(0, 1000),
+          size: rand(1.2, 2.2)
+        };
+      }
+      function resize() {
+        const rect = hero.getBoundingClientRect();
+        vw = Math.max(1, Math.floor(rect.width));
+        vh = Math.max(1, Math.floor(rect.height));
+        canvas.width = Math.floor(vw * dpr);
+        canvas.height = Math.floor(vh * dpr);
+        canvas.style.width = vw + 'px';
+        canvas.style.height = vh + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        configure();
+      }
+      function updateNode(n) {
+        n.phase += n.drift;
+        n.x += n.vx + Math.cos(n.phase) * 0.15;
+        n.y += n.vy + Math.sin(n.phase * 0.9) * 0.15;
 
-    function drawFrame() {
-      if (!running || prefersReduced) return;
-      
-      ctx.clearRect(0, 0, vw, vh);
+        // Mouse repelling for network
+        if (mouse.inside) {
+          const dx = n.x - mouse.x;
+          const dy = n.y - mouse.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const R = repelRadius();
+          if (d < R) {
+            const t = 1 - d / R;
+            const push = repelStrength * (t * t + 0.05);
+            n.x += (dx / d) * push * 6.0;
+            n.y += (dy / d) * push * 6.0;
+            const tx = -dy / d, ty = dx / d;
+            n.x += tx * swirlStrength * t * 8.0;
+            n.y += ty * swirlStrength * t * 8.0;
+          }
+        }
 
-      for (let i = 0; i < dots.length; i++) {
-        const d = dots[i];
-        updateDot(d);
-        
-        // Calculate dynamic properties
-        const distHome = Math.hypot(d.x - d.baseX, d.y - d.baseY);
-        const stretchRatio = Math.min(1, distHome / 20); // 0 to 1
-        
-        const radius = d.baseRadius + stretchRatio * 2.0;
-        // Increase opacity as it stretches
-        const maxOpacity = 0.15;
-        const stretchOpacity = 0.7;
-        const alpha = Math.min(1.0, maxOpacity + stretchRatio * stretchOpacity);
+        if (n.x < -10) n.x = vw + 10;
+        if (n.x > vw + 10) n.x = -10;
+        if (n.y < -10) n.y = vh + 10;
+        if (n.y > vh + 10) n.y = -10;
+      }
+      function drawFrame() {
+        if (!running || prefersReduced) return;
+        ctx.clearRect(0, 0, vw, vh);
 
+        for (let i = 0; i < nodes.length; i++) updateNode(nodes[i]);
+
+        for (let i = 0; i < nodes.length; i++) {
+          const a = nodes[i];
+          for (let j = i + 1; j < nodes.length; j++) {
+            const b = nodes[j];
+            const dx = a.x - b.x, dy = a.y - b.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < maxDist) {
+              const t = 1 - dist / maxDist;
+              ctx.globalAlpha = 0.08 * t;
+              ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 1)`;
+              ctx.lineWidth = 1;
+              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            }
+          }
+        }
+        for (let i = 0; i < nodes.length; i++) {
+          const n = nodes[i];
+          ctx.globalAlpha = 0.9;
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
+          ctx.beginPath(); ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Erase intersection
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0,0,0,1)';
         ctx.beginPath();
-        ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        const CX = vw / 2;
+        const CY = vh / 2;
+        const SCALE = vw < 640 ? 0.6 : 1;
+        const RW = 162 * SCALE; 
+        ctx.rect(CX - RW/2, 0, RW, vh);
+        ctx.rect(0, CY - RW/2, vw, RW);
         ctx.fill();
-        
-        // Draw connection to home simulating depth
-        if(stretchRatio > 0.05) {
-          ctx.beginPath();
-          ctx.moveTo(d.baseX, d.baseY);
-          ctx.lineTo(d.x, d.y);
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.4})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
+        ctx.globalCompositeOperation = 'source-over';
+
+        requestAnimationFrame(drawFrame);
+      }
+      resize();
+      if (!prefersReduced) requestAnimationFrame(drawFrame);
+      window.addEventListener('resize', () => {
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        resize();
+      }, { passive: true });
+
+    } else {
+      // Point Cloud
+      let dots = [];
+      const GRID_SIZE = 35;
+      const interactionRadius = 160;
+      const forceFactor = 2.0;
+
+      function resize() {
+        const rect = hero.getBoundingClientRect();
+        vw = Math.max(1, Math.floor(rect.width));
+        vh = Math.max(1, Math.floor(rect.height));
+        canvas.width = Math.floor(vw * dpr);
+        canvas.height = Math.floor(vh * dpr);
+        canvas.style.width = vw + 'px';
+        canvas.style.height = vh + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initDots();
+      }
+      function initDots() {
+        dots = [];
+        const cols = Math.ceil(vw / GRID_SIZE) + 1;
+        const rows = Math.ceil(vh / GRID_SIZE) + 1;
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            const baseX = i * GRID_SIZE;
+            const baseY = j * GRID_SIZE;
+            dots.push({
+              baseX: baseX, baseY: baseY,
+              x: baseX, y: baseY,
+              vx: 0, vy: 0,
+              baseRadius: 1.2,
+            });
+          }
         }
       }
+      function updateDot(d) {
+        if (mouse.inside) {
+          const dx = d.x - mouse.x;
+          const dy = d.y - mouse.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < interactionRadius && dist > 0.1) {
+            const force = (interactionRadius - dist) / interactionRadius;
+            d.vx += (dx / dist) * force * forceFactor;
+            d.vy += (dy / dist) * force * forceFactor;
+          }
+        }
+        const springK = 0.08, friction = 0.82;
+        d.vx += (d.baseX - d.x) * springK;
+        d.vy += (d.baseY - d.y) * springK;
+        d.vx *= friction;
+        d.vy *= friction;
+        d.x += d.vx;
+        d.y += d.vy;
+      }
+      function drawFrame() {
+        if (!running || prefersReduced) return;
+        ctx.clearRect(0, 0, vw, vh);
 
-      // Erase the network inside the road intersection area
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.fillStyle = 'rgba(0,0,0,1)';
-      ctx.beginPath();
-      const CX = vw / 2;
-      const CY = vh / 2;
-      const SCALE = vw < 640 ? 0.6 : 1;
-      const RW = 162 * SCALE; 
-      ctx.rect(CX - RW/2, 0, RW, vh);         // Vertical road segment
-      ctx.rect(0, CY - RW/2, vw, RW);         // Horizontal road segment
-      ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
+        for (let i = 0; i < dots.length; i++) {
+          const d = dots[i];
+          updateDot(d);
+          const distHome = Math.hypot(d.x - d.baseX, d.y - d.baseY);
+          const stretchRatio = Math.min(1, distHome / 20);
+          const radius = d.baseRadius + stretchRatio * 2.0;
+          const maxOpacity = 0.15;
+          const stretchOpacity = 0.7;
+          const alpha = Math.min(1.0, maxOpacity + stretchRatio * stretchOpacity);
 
-      requestAnimationFrame(drawFrame);
-    }
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+          ctx.fill();
+          
+          if(stretchRatio > 0.05) {
+            ctx.beginPath();
+            ctx.moveTo(d.baseX, d.baseY);
+            ctx.lineTo(d.x, d.y);
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.4})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
 
-    resize();
-    if (!prefersReduced) requestAnimationFrame(drawFrame);
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.beginPath();
+        const CX = vw / 2;
+        const CY = vh / 2;
+        const SCALE = vw < 640 ? 0.6 : 1;
+        const RW = 162 * SCALE; 
+        ctx.rect(CX - RW/2, 0, RW, vh);
+        ctx.rect(0, CY - RW/2, vw, RW);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
 
-    window.addEventListener('resize', () => {
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        requestAnimationFrame(drawFrame);
+      }
       resize();
-    }, { passive: true });
+      if (!prefersReduced) requestAnimationFrame(drawFrame);
+      window.addEventListener('resize', () => {
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        resize();
+      }, { passive: true });
+    }
   })();
 </script>
 <style>
