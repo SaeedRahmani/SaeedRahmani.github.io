@@ -12,7 +12,7 @@ export const siteConfig = {
     github: "https://github.com/SaeedRahmani",
   },
   aboutMe:
-    "I am a PhD candidate, expected to graduate in January 2026, with experience and interest in artificial intelligence for robotics and autonomous vehicles. I have hands-on experience with <strong>foundation models</strong> (both LLMs and VLMs), <strong>reinforcement learning</strong> , and <strong>world models</strong> for robot learning and verification, especially in complex and uncertain environments. My research focuses on developing AI systems for <strong>autonomous vehicles</strong> in mixed-autonomy traffic and <strong>safety and efficiency verification</strong> of automated vehicles in <strong>simulation</strong>.",
+    "I am a PhD candidate, expected to graduate in early 2026, with experience and interest in artificial intelligence for robotics and autonomous vehicles. I have hands-on experience with <strong>multi-agent reinforcement learning</strong>, <strong>foundation models</strong>, and <strong>world models</strong> for learning and verification, especially in complex and uncertain environments. My research focuses on developing AI systems for <strong>autonomous vehicles</strong> in mixed-autonomy traffic and <strong>safety and efficiency verification</strong> of automated vehicles in <strong>simulation</strong>.",
   skills: [
     "Python (PyTorch, TensorFlow, JAX)",
     "C++",
