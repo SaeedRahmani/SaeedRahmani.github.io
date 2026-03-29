@@ -355,8 +355,9 @@ const activeViz: string = 'lidar';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Density & link length scale with area
-      const target = Math.floor((vw * vh) / 36000);
-      nodeCount = Math.max(70, Math.min(260, target));
+      // To increase density, decrease the divisor (e.g. from 36000 to 18000)
+      const target = Math.floor((vw * vh) / 120000);
+      nodeCount = Math.max(50, Math.min(100, target));
       maxDist = Math.max(90, Math.min(240, Math.sqrt(vw * vh) / 6));
 
       // Adjust node pool
@@ -494,7 +495,17 @@ const activeViz: string = 'lidar';
 
       // Update physics
       for (let i = 0; i < nodes.length; i++) updateNode(nodes[i]);
-
+        // Erase the network inside the road intersection area
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.beginPath();
+        const CX = vw / 2;
+        const CY = vh / 2;
+        const RW = 162; // Slightly wider than the 160px road lines
+        ctx.rect(CX - RW/2, 0, RW, vh);         // Vertical road segment
+        ctx.rect(0, CY - RW/2, vw, RW);         // Horizontal road segment
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
       requestAnimationFrame(drawFrame);
     }
 
