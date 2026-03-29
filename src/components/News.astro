@@ -1,6 +1,7 @@
 ---
 import { siteConfig } from "../config";
 const hasNews = siteConfig.news && siteConfig.news.length > 0;
+const PREVIEW = 7;
 ---
 
 {
@@ -20,7 +21,7 @@ const hasNews = siteConfig.news && siteConfig.news.length > 0;
 
           <div class="lg:col-span-9">
             <ul class="space-y-3">
-              {siteConfig.news.map((item) => (
+              {siteConfig.news.slice(0, PREVIEW).map((item) => (
                 <li class="flex gap-3 text-sm leading-relaxed">
                   <span
                     class="flex-shrink-0 mt-[9px] w-1.5 h-1.5 rounded-full"
@@ -33,9 +34,57 @@ const hasNews = siteConfig.news && siteConfig.news.length > 0;
                 </li>
               ))}
             </ul>
+
+            {/* Collapsible extra rows */}
+            {siteConfig.news.length > PREVIEW && (
+              <ul id="news-extras" class="space-y-3 mt-3 hidden">
+                {siteConfig.news.slice(PREVIEW).map((item) => (
+                  <li class="flex gap-3 text-sm leading-relaxed">
+                    <span
+                      class="flex-shrink-0 mt-[9px] w-1.5 h-1.5 rounded-full"
+                      style={`background-color: ${siteConfig.accentColor}`}
+                    />
+                    <span>
+                      <span class="font-semibold text-gray-900 mr-2">{item.date}</span>
+                      <span class="text-gray-600" set:html={item.html} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {/* Show more / less toggle button */}
+            {siteConfig.news.length > PREVIEW && (
+              <button
+                id="news-toggle"
+                class="w-full mt-4 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors duration-150 bg-white"
+              >
+                <span id="news-toggle-label">Show {siteConfig.news.length - PREVIEW} more</span>
+                <svg id="news-toggle-chevron" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       </div>
     </section>
   )
 }
+
+<script>
+  const toggle = document.getElementById("news-toggle");
+  const extras = document.getElementById("news-extras");
+  const label = document.getElementById("news-toggle-label");
+  const chevron = document.getElementById("news-toggle-chevron");
+
+  if (toggle && extras && label && chevron) {
+    const moreCount = extras.children.length;
+    toggle.addEventListener("click", () => {
+      const isHidden = extras.classList.contains("hidden");
+      extras.classList.toggle("hidden", !isHidden);
+      label.textContent = isHidden ? "Show less" : `Show ${moreCount} more`;
+      chevron.style.transform = isHidden ? "rotate(180deg)" : "";
+    });
+  }
+</script>

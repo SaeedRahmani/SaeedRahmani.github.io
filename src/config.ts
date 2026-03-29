@@ -100,6 +100,18 @@ export const siteConfig = {
   ],
   news: [
     {
+      date: "Mar. 15, 2026",
+      html: `Made the code of <strong>NOMAD</strong> public. Check it out on <a href="https://github.com/nomaddrive/nomad" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">GitHub</a>.`,
+    },
+    {
+      date: "Mar. 10, 2026",
+      html: `Gave a talk at <a href="https://motional.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Motional</a> about <a href="https://nomaddrive.github.io/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">NOMAD</a>.`,
+    },
+    {
+      date: "Feb. 06, 2026",
+      html: `Gave a talk at <a href="https://emerge-lab.github.io/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">EMERGE lab</a> about <a href="https://nomaddrive.github.io/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">NOMAD</a>.`,
+    },
+    {
       date: "Oct. 2025",
       html: `Started as a Research Intern at <strong>Toyota Motors Europe</strong>, Belgium, working on VLMs and Transformers for anomaly detection in autonomous driving.`,
     },
