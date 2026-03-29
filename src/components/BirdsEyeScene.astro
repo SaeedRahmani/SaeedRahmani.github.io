@@ -1,0 +1,214 @@
+<canvas
+  id="av-scene"
+  style="opacity: 0; transition: opacity 1s ease; display: block;"
+></canvas>
+
+<script is:inline>
+  (function () {
+    const canvas = document.getElementById('av-scene');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const W = 300, H = 440;
+    canvas.width = W;
+    canvas.height = H;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+
+    const hero = document.getElementById('hero');
+    const cs = hero ? window.getComputedStyle(hero) : null;
+    const ACCENT = (cs ? cs.getPropertyValue('--accent-color').trim() : '') || '#1d4ed8';
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return [r, g, b];
+    }
+    const [ar, ag, ab] = hexToRgb(ACCENT);
+    const accentRgba = (a) => `rgba(${ar},${ag},${ab},${a})`;
+
+    // Road geometry — 3 lanes, vertical
+    const RL = 44, RR = W - 44;
+    const RW = RR - RL;
+    const LW = RW / 3;
+    const laneX = [RL + LW * 0.5, RL + LW * 1.5, RL + LW * 2.5];
+
+    const VW = 26, VH = 44;
+    const ego = { x: laneX[1] - VW / 2, y: H * 0.63, w: VW, h: VH };
+
+    const others = [
+      { lane: 1, relY: -200, w: 26, h: 42, label: 'V01' },
+      { lane: 0, relY: -115, w: 24, h: 40, label: 'V02' },
+      { lane: 2, relY: -75,  w: 26, h: 42, label: 'V03' },
+    ];
+
+    let offset = 0, pulse = 0;
+
+    function rr(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.arcTo(x + w, y, x + w, y + r, r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+      ctx.lineTo(x + r, y + h);
+      ctx.arcTo(x, y + h, x, y + h - r, r);
+      ctx.lineTo(x, y + r);
+      ctx.arcTo(x, y, x + r, y, r);
+      ctx.closePath();
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = '#0f172a';
+      rr(0, 0, W, H, 12);
+      ctx.fill();
+    }
+
+    function drawRoad() {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(RL, 0, RW, H);
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(RL, 0); ctx.lineTo(RL, H);
+      ctx.moveTo(RR, 0); ctx.lineTo(RR, H);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([26, 18]);
+      ctx.lineDashOffset = -offset;
+      for (let i = 1; i < 3; i++) {
+        const x = RL + LW * i;
+        ctx.beginPath();
+        ctx.moveTo(x, 0); ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.lineDashOffset = 0;
+    }
+
+    function drawCar(x, y, w, h, bodyColor, winAlpha) {
+      ctx.fillStyle = bodyColor;
+      rr(x, y, w, h, 5);
+      ctx.fill();
+      const ww = w - 8, wh = h * 0.22;
+      ctx.fillStyle = `rgba(255,255,255,${winAlpha})`;
+      rr(x + 4, y + 5, ww, wh, 2);
+      ctx.fill();
+      rr(x + 4, y + h - 5 - wh, ww, wh, 2);
+      ctx.fill();
+    }
+
+    function drawBBox(x, y, w, h, alpha, label) {
+      const pad = 7;
+      const bx = x - pad, by = y - pad, bw = w + pad * 2, bh = h + pad * 2;
+
+      ctx.strokeStyle = accentRgba(alpha * 0.55);
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.rect(bx, by, bw, bh);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const cl = 8;
+      ctx.strokeStyle = accentRgba(alpha);
+      ctx.lineWidth = 2;
+      const corners = [
+        [[bx, by + cl], [bx, by], [bx + cl, by]],
+        [[bx + bw - cl, by], [bx + bw, by], [bx + bw, by + cl]],
+        [[bx, by + bh - cl], [bx, by + bh], [bx + cl, by + bh]],
+        [[bx + bw - cl, by + bh], [bx + bw, by + bh], [bx + bw, by + bh - cl]],
+      ];
+      for (const pts of corners) {
+        ctx.beginPath();
+        ctx.moveTo(...pts[0]);
+        ctx.lineTo(...pts[1]);
+        ctx.lineTo(...pts[2]);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = accentRgba(alpha);
+      ctx.font = 'bold 8px monospace';
+      ctx.fillText(label, bx + 2, by - 3);
+    }
+
+    function drawTrajectory() {
+      const cx = ego.x + ego.w / 2;
+      const sy = ego.y;
+      ctx.strokeStyle = accentRgba(0.65);
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.moveTo(cx, sy);
+      ctx.bezierCurveTo(cx - 2, sy - 85, cx + 16, sy - 180, cx + 5, sy - 290);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const waypoints = [[cx - 1, sy - 68], [cx + 9, sy - 148], [cx + 6, sy - 228]];
+      for (const [px, py] of waypoints) {
+        ctx.fillStyle = accentRgba(0.55);
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawLiveIndicator() {
+      const blink = Math.sin(pulse * 3) > 0;
+      ctx.fillStyle = blink ? '#22c55e' : '#15803d';
+      ctx.beginPath();
+      ctx.arc(W - 14, 14, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(148,163,184,0.65)';
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText('LIVE', W - 22, 18);
+      ctx.textAlign = 'left';
+    }
+
+    function drawEgoLabel() {
+      ctx.fillStyle = 'rgba(148,163,184,0.45)';
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('EGO', ego.x + ego.w / 2, ego.y + ego.h + 13);
+      ctx.textAlign = 'left';
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      offset = (offset + 1.2) % 44;
+      pulse = (pulse + 0.022) % (Math.PI * 2);
+
+      drawBackground();
+      drawRoad();
+
+      for (const v of others) {
+        v.relY += 0.9;
+        if (v.relY > H * 0.44) {
+          v.relY = -H * 0.75 - Math.random() * 60;
+        }
+        const vx = laneX[v.lane] - v.w / 2;
+        const vy = ego.y + v.relY;
+        if (vy + v.h > -30 && vy < H + 30) {
+          drawCar(vx, vy, v.w, v.h, '#475569', 0.25);
+          const alpha = 0.5 + 0.38 * Math.sin(pulse);
+          drawBBox(vx, vy, v.w, v.h, alpha, v.label);
+        }
+      }
+
+      drawTrajectory();
+      drawCar(ego.x, ego.y, ego.w, ego.h, ACCENT, 0.3);
+      drawEgoLabel();
+      drawLiveIndicator();
+
+      requestAnimationFrame(frame);
+    }
+
+    frame();
+    setTimeout(() => { canvas.style.opacity = '1'; }, 800);
+  })();
+</script>

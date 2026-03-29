@@ -1,5 +1,11 @@
 ---
 import { siteConfig } from "../config";
+import BirdsEyeScene from "./BirdsEyeScene.astro";
+import PathPlanningGrid from "./PathPlanningGrid.astro";
+import LidarScene from "./LidarScene.astro";
+
+// ↓ Change this one word to swap the AV visualization: 'birds-eye' | 'path-planning' | 'lidar'
+const activeViz: string = 'lidar';
 ---
 
 <div
@@ -129,25 +135,31 @@ import { siteConfig } from "../config";
       height="100%"
       stroke-width={0}></rect>
   </svg>
-  <div class="h-full mx-auto p-8 sm:p-12 md:p-24 flex items-center">
-    <div>
-      <h2
-        class="text-pretty text-xl sm:text-2xl md:text-5xl font-bold tracking-tight text-gray-700 animate-fade-in"
-      >
-        Hello! 👋
-      </h2>
-      <h1
-        class="mt-6 sm:mt-8 md:mt-10 text-pretty text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight text-gray-800 animate-fade-in animation-delay-200"
-      >
-        This is <span style={{ color: siteConfig.accentColor }}
-          >{siteConfig.name}</span
+
+  <!-- AV Visualization — Fullscreen background -->
+  <div class="absolute inset-0 -z-[5] flex items-center justify-center pointer-events-none overflow-hidden" aria-hidden="true" style="opacity: 0.35; filter: saturate(0.5);">
+    {activeViz === 'birds-eye' ? <BirdsEyeScene /> : activeViz === 'lidar' ? <LidarScene /> : <PathPlanningGrid />}
+  </div>
+
+  <div class="h-full mx-auto p-8 sm:p-12 md:p-24 flex items-center relative z-10">
+    <div class="w-full max-w-2xl">
+        <h2
+          class="text-pretty text-xl sm:text-2xl md:text-5xl font-bold tracking-tight text-gray-700 animate-fade-in"
         >
-      </h1>
-      <p
-        class="mt-4 sm:mt-6 md:mt-8 text-pretty text-base sm:text-lg md:text-xl/8 font-medium text-gray-600 animate-fade-in animation-delay-400"
-      >
-        {siteConfig.title}
-      </p>
+          Hello! 👋
+        </h2>
+        <h1
+          class="mt-6 sm:mt-8 md:mt-10 text-pretty text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight text-gray-800 animate-fade-in animation-delay-200"
+        >
+          This is <span style={{ color: siteConfig.accentColor }}
+            >{siteConfig.name}</span
+          >
+        </h1>
+        <p
+          class="mt-4 sm:mt-6 md:mt-8 text-pretty text-base sm:text-lg md:text-xl/8 font-medium text-gray-600 animate-fade-in animation-delay-400"
+        >
+          {siteConfig.title}
+        </p>
     </div>
   </div>
   <div

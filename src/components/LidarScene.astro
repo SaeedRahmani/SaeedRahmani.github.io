@@ -1,0 +1,252 @@
+<canvas
+  id="lidar-scene"
+  class="w-full h-full object-cover"
+  style="opacity: 0; transition: opacity 1.5s ease; display: block;"
+></canvas>
+
+<script is:inline>
+(function () {
+  const canvas = document.getElementById('lidar-scene');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let W, H, CX, CY;
+
+  function resize() {
+    W = canvas.parentElement.clientWidth || window.innerWidth;
+    H = canvas.parentElement.clientHeight || window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+    CX = W / 2;
+    CY = H / 2;
+    if (ego && ego.y < -100) ego.y = H + 200;
+  }
+  
+  window.addEventListener('resize', resize);
+
+  const hero  = document.getElementById('hero');
+  const ACCENT = (hero ? getComputedStyle(hero).getPropertyValue('--accent-color').trim() : '') || '#1d4ed8';
+  
+  function hx(h) { 
+    h = h.replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c+c).join('');
+    return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; 
+  }
+  const [ar,ag,ab] = hx(ACCENT);
+  const rgba = a => `rgba(${ar},${ag},${ab},${a})`;
+
+  const RW = 160; 
+  let ego = { x: 0, y: 0, spd: 0, state: 'approach' };
+  let cvs = [];
+
+  function spawnCrossVehicles() {
+    cvs = [
+      { x: CX - 600, y: CY + RW/4, len: 44, wid: 20, spd: 3.5 },
+      { x: CX + 400, y: CY - RW/4, len: 44, wid: 20, spd: -2.8 },
+      { x: CX - 100, y: CY + RW/4, len: 44, wid: 20, spd: 3.2 },
+    ];
+  }
+
+  const RAYS = 360;
+  const hitAlpha = new Float32Array(RAYS);
+  const hitPX    = new Float32Array(RAYS);
+  const hitPY    = new Float32Array(RAYS);
+  const hadHit   = new Uint8Array(RAYS);
+  let sweep = 0;
+  const SSPD = 0.045;
+
+  function segHit(dx, dy, ax, ay, bx, by, ox, oy) {
+    const ex = bx-ax, ey = by-ay;
+    const d = dx*ey - dy*ex;
+    if (Math.abs(d) < 1e-9) return null;
+    const fx = ax-ox, fy = ay-oy;
+    const t = (fx*ey - fy*ex) / d;
+    const u = (fx*dy - fy*dx) / d;
+    return (t > 0.5 && u >= 0 && u <= 1) ? t : null;
+  }
+
+  function recast() {
+    const MAX_R = Math.min(W, H) * 0.75 + 100;
+    const polys = [
+      [[-20, -20], [CX-RW/2, -20], [CX-RW/2, CY-RW/2], [-20, CY-RW/2]],
+      [[W+20, -20], [CX+RW/2, -20], [CX+RW/2, CY-RW/2], [W+20, CY-RW/2]],
+      [[-20, H+20], [CX-RW/2, H+20], [CX-RW/2, CY+RW/2], [-20, CY+RW/2]],
+      [[W+20, H+20], [CX+RW/2, H+20], [CX+RW/2, CY+RW/2], [W+20, CY+RW/2]]
+    ];
+
+    for (let c of cvs) {
+      let hw = c.len/2, hh = c.wid/2;
+      polys.push([[c.x-hw, c.y-hh], [c.x+hw, c.y-hh], [c.x+hw, c.y+hh], [c.x-hw, c.y+hh]]);
+    }
+
+    for (let i = 0; i < RAYS; i++) {
+      const ang = (i / RAYS) * Math.PI * 2;
+      const dx = Math.cos(ang), dy = Math.sin(ang);
+      let minT = MAX_R, hit = 0;
+
+      for (const poly of polys) {
+        const L = poly.length;
+        for (let j = 0; j < L; j++) {
+          const [ax,ay] = poly[j], [bx,by] = poly[(j+1)%L];
+          const t = segHit(dx,dy,ax,ay,bx,by, ego.x, ego.y);
+          if (t && t < minT) { minT = t; hit = 1; }
+        }
+      }
+
+      if (hit) { hitPX[i] = ego.x + dx*minT; hitPY[i] = ego.y + dy*minT; }
+      hadHit[i] = hit;
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(CX - RW/2, 0); ctx.lineTo(CX - RW/2, CY - RW/2);
+    ctx.moveTo(CX - RW/2, CY + RW/2); ctx.lineTo(CX - RW/2, H);
+    ctx.moveTo(CX + RW/2, 0); ctx.lineTo(CX + RW/2, CY - RW/2);
+    ctx.moveTo(CX + RW/2, CY + RW/2); ctx.lineTo(CX + RW/2, H);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, CY - RW/2); ctx.lineTo(CX - RW/2, CY - RW/2);
+    ctx.moveTo(CX + RW/2, CY - RW/2); ctx.lineTo(W, CY - RW/2);
+    ctx.moveTo(0, CY + RW/2); ctx.lineTo(CX - RW/2, CY + RW/2);
+    ctx.moveTo(CX + RW/2, CY + RW/2); ctx.lineTo(W, CY + RW/2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.setLineDash([16, 24]);
+    ctx.beginPath();
+    ctx.moveTo(CX, 0); ctx.lineTo(CX, CY - RW/2);
+    ctx.moveTo(CX, CY + RW/2); ctx.lineTo(CX, H);
+    ctx.moveTo(0, CY); ctx.lineTo(CX - RW/2, CY);
+    ctx.moveTo(CX + RW/2, CY); ctx.lineTo(W, CY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(CX, CY + RW/2 + 25); ctx.lineTo(CX + RW/2, CY + RW/2 + 25);
+    ctx.stroke();
+
+    ctx.lineWidth = 1;
+    for (let c of cvs) {
+      ctx.beginPath();
+      ctx.roundRect(c.x - c.len/2, c.y - c.wid/2, c.len, c.wid, 4);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = rgba(0.9);
+    ctx.shadowColor = rgba(0.6);
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.roundRect(ego.x - 10, ego.y - 18, 20, 36, 4);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    const MAX_R = Math.min(W, H) * 0.75 + 100;
+    const arc = Math.PI / 3.5;
+    ctx.save();
+    ctx.translate(ego.x, ego.y);
+    ctx.rotate(sweep);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, MAX_R, -arc, 0);
+    ctx.closePath();
+    
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, MAX_R);
+    g.addColorStop(0, rgba(0.12));
+    g.addColorStop(0.5, rgba(0.04));
+    g.addColorStop(1, rgba(0));
+    ctx.fillStyle = g;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(0,0); ctx.lineTo(MAX_R, 0);
+    ctx.strokeStyle = rgba(0.35);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = rgba(0.85);
+    for (let i = 0; i < RAYS; i++) {
+      if (hitAlpha[i] < 0.02) continue;
+      ctx.globalAlpha = hitAlpha[i];
+      ctx.beginPath();
+      ctx.arc(hitPX[i], hitPY[i], 1.8, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function update() {
+    const STOP_LINE = CY + RW/2 + 25;
+    ego.x = CX + RW/4;
+    
+    let danger = cvs.some(c => c.x > CX - RW/2 - 80 && c.x < CX + RW/2 + 80);
+
+    if (ego.state === 'approach') {
+      let dist = ego.y - STOP_LINE;
+      if (dist < 180 && dist > 0 && danger) {
+        ego.state = 'stopping';
+      } else if (dist <= 0) {
+        if (danger) { ego.state = 'wait'; ego.spd = 0; }
+        else ego.state = 'cross';
+      }
+      ego.spd += (3.5 - ego.spd) * 0.04;
+    } else if (ego.state === 'stopping') {
+      let dist = ego.y - STOP_LINE;
+      ego.spd = Math.min(ego.spd, Math.max(dist * 0.05, 0.5));
+      if (dist <= 2) { ego.y = STOP_LINE; ego.spd = 0; ego.state = 'wait'; }
+    } else if (ego.state === 'wait') {
+      ego.spd = 0;
+      if (!danger) ego.state = 'cross';
+    } else if (ego.state === 'cross') {
+      ego.spd += (4.5 - ego.spd) * 0.06;
+      if (ego.y < -150) {
+        ego.y = H + 300;
+        ego.state = 'approach';
+        spawnCrossVehicles();
+      }
+    }
+    ego.y -= ego.spd;
+
+    for (let c of cvs) {
+      c.x += c.spd;
+      if (c.spd > 0 && c.x > W + 400) c.x = -200;
+      if (c.spd < 0 && c.x < -400) c.x = W + 200;
+    }
+
+    const prev = sweep;
+    sweep = (sweep + SSPD) % (Math.PI * 2);
+    recast();
+
+    for (let i = 0; i < RAYS; i++) {
+      const ang = (i/RAYS)*Math.PI*2;
+      const fresh = prev < sweep ? (ang>=prev && ang<sweep) : (ang>=prev || ang<sweep);
+      hitAlpha[i] = fresh ? (hadHit[i] ? 1.0 : 0) : hitAlpha[i] * 0.96;
+    }
+  }
+
+  function frame() {
+    if (W && H) {
+      update();
+      draw();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  resize();
+  ego.y = H + 300;
+  spawnCrossVehicles();
+  frame();
+  setTimeout(() => { canvas.style.opacity = '1'; }, 300);
+})();
+</script>
