@@ -19,7 +19,7 @@
     canvas.height = H;
     CX = W / 2;
     CY = H / 2;
-    if (ego && ego.y < -100) ego.y = H + 200;
+    if (ego && ego.y > H + 100) ego.y = -200;
   }
   
   window.addEventListener('resize', resize);
@@ -130,7 +130,7 @@
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(CX, CY + RW/2 + 25); ctx.lineTo(CX + RW/2, CY + RW/2 + 25);
+    ctx.moveTo(CX - RW/2, CY - RW/2 - 25); ctx.lineTo(CX, CY - RW/2 - 25);
     ctx.stroke();
 
     ctx.lineWidth = 1;
@@ -187,13 +187,13 @@
   }
 
   function update() {
-    const STOP_LINE = CY + RW/2 + 25;
-    ego.x = CX + RW/4;
+    const STOP_LINE = CY - RW/2 - 25;
+    ego.x = CX - RW/4;
     
     let danger = cvs.some(c => c.x > CX - RW/2 - 80 && c.x < CX + RW/2 + 80);
 
     if (ego.state === 'approach') {
-      let dist = ego.y - STOP_LINE;
+      let dist = STOP_LINE - ego.y;
       if (dist < 180 && dist > 0 && danger) {
         ego.state = 'stopping';
       } else if (dist <= 0) {
@@ -202,7 +202,7 @@
       }
       ego.spd += (3.5 - ego.spd) * 0.04;
     } else if (ego.state === 'stopping') {
-      let dist = ego.y - STOP_LINE;
+      let dist = STOP_LINE - ego.y;
       ego.spd = Math.min(ego.spd, Math.max(dist * 0.05, 0.5));
       if (dist <= 2) { ego.y = STOP_LINE; ego.spd = 0; ego.state = 'wait'; }
     } else if (ego.state === 'wait') {
@@ -210,13 +210,13 @@
       if (!danger) ego.state = 'cross';
     } else if (ego.state === 'cross') {
       ego.spd += (4.5 - ego.spd) * 0.06;
-      if (ego.y < -150) {
-        ego.y = H + 300;
+      if (ego.y > H + 150) {
+        ego.y = -300;
         ego.state = 'approach';
         spawnCrossVehicles();
       }
     }
-    ego.y -= ego.spd;
+    ego.y += ego.spd;
 
     for (let c of cvs) {
       c.x += c.spd;
@@ -244,7 +244,7 @@
   }
 
   resize();
-  ego.y = H + 300;
+  ego.y = -300;
   spawnCrossVehicles();
   frame();
   setTimeout(() => { canvas.style.opacity = '1'; }, 300);
