@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Saeed",
+  name: "Saeed Rahmani",
   title: "PhD Candidate | AI & Autonomous Driving",
   // Find your ID at semanticscholar.org — search your name, click your profile, copy the number from the URL
   semanticScholarId: "2325726503",

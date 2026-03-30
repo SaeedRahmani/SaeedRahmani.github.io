@@ -21,23 +21,72 @@ import "../styles/global.css";
     <meta name="description" content={siteConfig.description} />
     <meta name="google-site-verification" content="Js7ysB3TZo7-ZlX6oUb1_3ySCMGCIzhFW07po0phkKg" />
 
-    <!-- Add these SEO meta tags -->
-    <meta name="keywords" content="Saeed Rahmani, AI researcher, autonomous vehicles, reinforcement learning, TU Delft, Oxford University, machine learning, robotics" />
-    <meta name="author" content={siteConfig.name} />
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://saeedrahmani.github.io/" />
+
+    <!-- SEO meta tags -->
+    <meta name="keywords" content="Saeed Rahmani, AI researcher, autonomous vehicles, reinforcement learning, TU Delft, Oxford University, machine learning, robotics, foundation models, world models" />
+    <meta name="author" content="Saeed Rahmani" />
+    <meta name="robots" content="index, follow" />
     
     <!-- Open Graph for social media -->
-    <meta property="og:title" content={`${siteConfig.name} - ${siteConfig.title}`} />
+    <meta property="og:title" content="Saeed Rahmani - PhD Candidate | AI & Autonomous Driving" />
     <meta property="og:description" content={siteConfig.description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://saeedrahmani.github.io" />
+    <meta property="og:url" content="https://saeedrahmani.github.io/" />
+    <meta property="og:site_name" content="Saeed Rahmani" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Saeed Rahmani - PhD Candidate | AI & Autonomous Driving" />
+    <meta name="twitter:description" content={siteConfig.description} />
     
+    <!-- JSON-LD Structured Data for Person -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Saeed Rahmani",
+      "url": "https://saeedrahmani.github.io",
+      "email": "saeed.rahmani@cs.ox.ac.uk",
+      "jobTitle": "PhD Candidate",
+      "worksFor": [
+        {
+          "@type": "Organization",
+          "name": "University of Oxford",
+          "url": "https://www.ox.ac.uk"
+        },
+        {
+          "@type": "Organization",
+          "name": "TU Delft",
+          "url": "https://www.tudelft.nl"
+        }
+      ],
+      "alumniOf": [
+        {
+          "@type": "Organization",
+          "name": "University of Oxford"
+        },
+        {
+          "@type": "Organization",
+          "name": "TU Delft"
+        }
+      ],
+      "knowsAbout": ["Artificial Intelligence", "Autonomous Vehicles", "Reinforcement Learning", "Foundation Models", "World Models", "Multi-Agent Systems"],
+      "sameAs": [
+        "https://www.linkedin.com/in/saeedrahmani/",
+        "https://github.com/SaeedRahmani",
+        "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en"
+      ]
+    })} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet"
     />
-    <title>{siteConfig.name} - {siteConfig.title}</title>
+    <title>Saeed Rahmani - {siteConfig.title}</title>
   </head>
   <body>
     <Header />

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saeedrahmani.github.io/sitemap-index.xml
