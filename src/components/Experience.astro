@@ -23,7 +23,7 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
             {siteConfig.experience.map((exp) => (
               <div class="bg-white px-4 py-4">
                 {/* Header row */}
-                <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center justify-between mb-1">
                   <div class="flex items-center gap-3 min-w-0 flex-1">
                     {exp.logo && (
                       <img
@@ -35,14 +35,15 @@ const hasExperience = siteConfig.experience && siteConfig.experience.length > 0;
                     <span class="font-medium text-gray-900 text-sm truncate">
                       {exp.company}
                     </span>
-                    <span class="text-gray-300 flex-shrink-0 text-xs">·</span>
-                    <span class="text-gray-500 text-sm truncate">
-                      {exp.title}
-                    </span>
                   </div>
                   <span class="text-xs text-gray-400 flex-shrink-0 ml-3">
                     {exp.dateRange}
                   </span>
+                </div>
+
+                {/* Title row */}
+                <div class="text-gray-500 text-sm mb-3 pl-12">
+                  {exp.title}
                 </div>
 
                 {/* Bullets always visible */}

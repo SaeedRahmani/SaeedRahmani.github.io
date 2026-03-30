@@ -46,7 +46,7 @@ export const siteConfig = {
     },
     {
       company: "EU Horizon Project Hi-Drive, Delft University of Technology",
-      title: "Research Engineer",
+      title: "Simulation-based Validation and Evalulation of AVs, Research Engineer",
       dateRange: "Jan. 2022 – Nov. 2025",
       logo: "/logos/hi-drive.png",
       images: [],
@@ -70,7 +70,7 @@ export const siteConfig = {
     // },
     {
       company: "TU Delft, Netherlands",
-      title: "PhD Candidate",
+      title: "Decision-making and Planning for AVs in Mixed-Autonomy Traffic, PhD Candidate",
       dateRange: "Jan. 2022 – present",
       logo: "/logos/tudelft.png",
       images: ["/images/tudelft-1.jpg", "/images/tudelft-2.jpg"],
