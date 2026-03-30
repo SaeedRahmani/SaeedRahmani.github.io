@@ -45,6 +45,19 @@ export const siteConfig = {
       ],
     },
     {
+      company: "EU Flagship Project Hi-Drive, Delft University of Technology",
+      title: "Research Engineer",
+      dateRange: "Jan. 2022 – Nov. 2025",
+      logo: "/logos/hi-Drive.jpeg",
+      images: [],
+      bullets: [
+        "Contributed to the development of Hi-Drive automated driving function (ADF), a simulation model for longitudinal and lateral control of sim agents in both motorways and urban areas",
+        "Led the working group on simulation parameterization for virtual verification of AVs; calibrated 30+ parameters",
+        "Developed methods to extract edge cases and safety-critical scenarios from Hi-Drive, Waymo, and Lyft datasets",
+        "Collaborated with a team of 50+ people from 30+ car manufacturers and institutions in Europe; 7 deliverables",
+      ],
+    },
+    {
       company: "BMW Group, Germany",
       title: "Simulation Agent Modeler, Visiting Research Engineer",
       dateRange: "Aug. 2024",

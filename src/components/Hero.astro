@@ -637,8 +637,8 @@ const interactiveBg: string = 'network';
 
   /* Mouse outline */
   .mouse-shape {
-    width: 34px;
-    height: 58px;
+    width: 24px;
+    height: 40px;
     border: 2px solid rgba(60, 60, 60, 0.6);
     border-radius: 22px;
     display: flex;
@@ -649,25 +649,45 @@ const interactiveBg: string = 'network';
     backdrop-filter: blur(2px);
   }
 
+  @media (min-width: 640px) {
+    .mouse-shape {
+      width: 32px;
+      height: 52px;
+    }
+  }
+
   /* Moving dot */
   .mouse-dot {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     background: rgba(40, 40, 40, 0.8);
     border-radius: 50%;
     margin-top: 6px;
     animation: mouse-scroll 1.4s ease-in-out infinite;
   }
 
+  @media (min-width: 640px) {
+    .mouse-dot {
+      width: 6px;
+      height: 6px;
+    }
+  }
+
   /* scroll text */
   .scroll-text {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     display: block;
     margin-top: .45rem;
     color: rgba(50, 50, 50, 0.7);
     font-weight: 500;
+  }
+
+  @media (min-width: 640px) {
+    .scroll-text {
+      font-size: 0.75rem;
+    }
   }
 
   /* Hover effect */
