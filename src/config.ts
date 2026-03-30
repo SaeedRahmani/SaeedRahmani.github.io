@@ -45,7 +45,7 @@ export const siteConfig = {
       ],
     },
     {
-      company: "EU Flagship Project Hi-Drive, Delft University of Technology",
+      company: "EU Horizon Project Hi-Drive, Delft University of Technology",
       title: "Research Engineer",
       dateRange: "Jan. 2022 – Nov. 2025",
       logo: "/logos/hi-drive.png",
@@ -57,17 +57,17 @@ export const siteConfig = {
         "Collaborated with a team of 50+ people from 30+ car manufacturers and institutions in Europe; 7 deliverables",
       ],
     },
-    {
-      company: "BMW Group, Germany",
-      title: "Simulation Agent Modeler, Visiting Research Engineer",
-      dateRange: "Aug. 2024",
-      logo: "/logos/bmw.png",
-      images: ["/images/bmw-1.jpg", "/images/bmw-2.jpg"],
-      bullets: [
-        "Debugged a simulation agent model and an autonomous control algorithm for safety-critical scenarios",
-        "Designed and implemented 14 challenging scenarios for safety validation of autonomous vehicles",
-      ],
-    },
+    // {
+    //   company: "BMW Group, Germany",
+    //   title: "Simulation Agent Modeler, Visiting Research Engineer",
+    //   dateRange: "Aug. 2024",
+    //   logo: "/logos/bmw.png",
+    //   images: ["/images/bmw-1.jpg", "/images/bmw-2.jpg"],
+    //   bullets: [
+    //     "Debugged a simulation agent model and an autonomous control algorithm for safety-critical scenarios",
+    //     "Designed and implemented 14 challenging scenarios for safety validation of autonomous vehicles",
+    //   ],
+    // },
     {
       company: "TU Delft, Netherlands",
       title: "PhD Candidate",
