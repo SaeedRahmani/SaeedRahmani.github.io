@@ -113,6 +113,14 @@ export const siteConfig = {
   ],
   news: [
     {
+      date: "Apr. 1, 2026",
+      html: `Gave a talk at <a href="https://Waymo.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Waymo UK</a> about <a href="https://nomaddrive.github.io/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">NOMAD</a>.`,
+    },
+    {
+      date: "Mar. 18, 2026",
+      html: `New preprint: <strong>DiscoGen</strong>, a procedural generator of algorithm discovery tasks for machine learning. <a href="https://arxiv.org/abs/2603.17863" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">arXiv</a>.`,
+    },
+    {
       date: "Mar. 15, 2026",
       html: `Made the code of <strong>NOMAD</strong> public. Check it out on <a href="https://github.com/nomaddrive/nomad" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">GitHub</a>.`,
     },
