@@ -84,21 +84,75 @@ export const siteConfig = {
   ],
   projects: [
     {
+      name: "NOMAD: Driving in New Cities Without Demos",
+      description:
+        "RL and imitation learning framework for training autonomous driving agents that generalize to new cities without human demonstrations.",
+      link: "https://github.com/nomaddrive/NOMAD",
+      skills: ["Python", "PyTorch", "MARL", "GPUDrive"],
+      emoji: "🧭",
+      image: "",
+    },
+    {
+      name: "DiscoGen: Algorithm Discovery Benchmark",
+      description:
+        "Procedural generator of algorithm discovery tasks across ML domains including RL, vision, language modeling, and trajectory prediction.",
+      link: "https://github.com/AlexGoldie/discogen",
+      skills: ["Python", "JAX", "ML Benchmarks"],
+      emoji: "🧬",
+      image: "",
+    },
+    {
+      name: "Heterogeneous Multi-Agent Driving",
+      description:
+        "VAE-based heterogeneous agent modeling in PufferDrive for realistic multi-agent driving simulation with diverse behavior styles.",
+      link: "https://github.com/SaeedRahmani/PufferDrive_hetero/tree/saeed/hetero_vae",
+      skills: ["Python", "CUDA", "MARL", "VAE"],
+      emoji: "🎭",
+      image: "",
+    },
+    {
+      name: "MPC*RL: Hybrid Planning for AVs",
+      description:
+        "Integrating Model Predictive Control with Deep RL for safe and efficient autonomous vehicle control at unsignalized intersections.",
+      link: "https://github.com/SaeedRahmani/DRL_MPC_for_AVs",
+      skills: ["Python", "MPC", "Deep RL"],
+      emoji: "🧠",
+      image: "",
+    },
+    {
+      name: "Simulation Framework for Mixed-Autonomy Traffic",
+      description:
+        "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles.",
+      link: "https://github.com/SaeedRahmani/AV-Simulation-at-Intersections",
+      skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
+      emoji: "🚦",
+      image: "",
+    },
+    {
+      name: "Human-AV Interaction at Intersections",
+      description:
+        "Data-driven analysis of autonomous and human-driven vehicle interactions at unsignalized intersections using Waymo and Lyft datasets.",
+      link: "https://github.com/SaeedRahmani/Unsignalized_AV_HV",
+      skills: ["Python", "Data Analysis", "Waymo"],
+      emoji: "🤝",
+      image: "",
+    },
+    {
+      name: "Interactive MPC Learning Tool",
+      description:
+        "Educational GUI application for exploring Model Predictive Control with interactive trajectory design and real-time parameter tuning.",
+      link: "https://github.com/SaeedRahmani/mpc__iv_course",
+      skills: ["Python", "MPC", "Education"],
+      emoji: "🎓",
+      image: "",
+    },
+    {
       name: "Imitation Learning for AVs Inside World Models",
       description:
         "RNN-based World Model for training autonomous vehicles through imitation learning in complex driving scenarios.",
       link: "https://github.com/SaeedRahmani/Dream_Imitation_AVs",
       skills: ["Python", "PyTorch", "World Models"],
       emoji: "🌍",
-      image: "",
-    },
-    {
-      name: "Simulation Agents for Mixed-Autonomy Traffic",
-      description:
-        "Real-time simulation framework for evaluating autonomous vehicles in mixed traffic scenarios with human-driven vehicles.",
-      link: "https://github.com/SaeedRahmani/AV-Simulation-at-Intersections",
-      skills: ["Python", "C++", "Reinforcement Learning", "MPC"],
-      emoji: "🚦",
       image: "",
     },
     {
