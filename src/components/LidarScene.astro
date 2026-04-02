@@ -96,6 +96,9 @@
   }
   setupMouse();
 
+  // Accept ghost cursor position from the demo animation
+  window.__lidarMouse = mouse;
+
   function spawnCrossVehicles() {
     cvs = [
       { x: CX - 600 * SCALE, y: CY + RW/4, len: 44 * SCALE, wid: 20 * SCALE, baseSpd: 3.5 * SCALE, spd: 3.5 * SCALE },

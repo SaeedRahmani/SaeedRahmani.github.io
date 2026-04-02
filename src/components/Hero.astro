@@ -9,11 +9,15 @@ const activeViz: string = 'lidar';
 
 // ↓ Change this to swap the interactive background: 'network' | 'point-cloud'
 const interactiveBg: string = 'network';
+
+// ↓ Change this to swap the interaction hint: 'none' | 'tooltip' | 'ghost-cursor' | 'both'
+const hintMode: string = 'none';
 ---
 
 <div
   id="hero"
   data-bg-type={interactiveBg}
+  data-hint-mode={hintMode}
   class="relative isolate overflow-hidden bg-white py-24 md:h-screen"
   style={`--accent-color: ${siteConfig.accentColor}`}
 >
@@ -293,6 +297,22 @@ const interactiveBg: string = 'network';
   <div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
     <canvas id="hero-net" class="w-full h-full"></canvas>
   </div>
+  <!-- Interaction hint tooltip (desktop only) -->
+  <div id="interaction-hint" class="interaction-hint hidden md:flex" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hint-icon">
+      <path d="M5 3 3.13 5.27a3.5 3.5 0 0 0 0 4.46L5 12" />
+      <path d="m19 3 1.87 2.27a3.5 3.5 0 0 1 0 4.46L19 12" />
+      <path d="M12 12v6" />
+      <path d="M12 21a1 1 0 0 1-1-1v-2a3 3 0 0 1 3-3h0" />
+      <path d="M8 2h8" />
+      <path d="M12 2v4" />
+    </svg>
+    <span>Move your cursor to interact with the traffic simulation</span>
+  </div>
+
+  <!-- Ghost cursor demo overlay (desktop only) -->
+  <canvas id="ghost-cursor-canvas" class="ghost-cursor-canvas" aria-hidden="true"></canvas>
+
   <!-- Modern scroll indicator -->
   <div id="scroll-indicator" class="scroll-indicator-container">
     <div class="mouse-shape">
@@ -312,6 +332,271 @@ const interactiveBg: string = 'network';
       if (next) next.scrollIntoView({ behavior: "smooth" });
       else window.scrollBy({ top: window.innerHeight, behavior: "smooth" });
     });
+  })();
+</script>
+
+<script is:inline>
+  (function () {
+    const hero = document.getElementById('hero');
+    const hint = document.getElementById('interaction-hint');
+    if (!hero || !hint || window.innerWidth < 768) return;
+
+    var mode = hero.dataset.hintMode || 'tooltip';
+    if (mode !== 'tooltip' && mode !== 'both') return;
+
+    let shown = false;
+    let hideTimer = null;
+
+    function showHint() {
+      if (shown) return;
+      shown = true;
+      hero.removeEventListener('mouseenter', showHint);
+
+      hint.classList.add('hint-visible');
+
+      hideTimer = setTimeout(function () {
+        hint.classList.add('hint-fading');
+        hint.addEventListener('animationend', function () {
+          hint.classList.remove('hint-visible', 'hint-fading');
+        }, { once: true });
+      }, 5000);
+    }
+
+    function dismissHint() {
+      if (!hint.classList.contains('hint-visible')) return;
+      if (hideTimer) clearTimeout(hideTimer);
+      hint.classList.add('hint-fading');
+      hint.addEventListener('animationend', function () {
+        hint.classList.remove('hint-visible', 'hint-fading');
+      }, { once: true });
+    }
+
+    // Show on first mouse enter into hero
+    hero.addEventListener('mouseenter', showHint);
+    // Dismiss early on click
+    hint.addEventListener('click', dismissHint);
+  })();
+</script>
+
+<script is:inline>
+  (function () {
+    var hero = document.getElementById('hero');
+    var gc = document.getElementById('ghost-cursor-canvas');
+    if (!hero || !gc || window.innerWidth < 768) return;
+
+    var mode = hero.dataset.hintMode || 'tooltip';
+    if (mode !== 'ghost-cursor' && mode !== 'both') return;
+
+    var ctx = gc.getContext('2d');
+    if (!ctx) return;
+
+    var vw, vh;
+    function resize() {
+      vw = hero.clientWidth;
+      vh = hero.clientHeight;
+      gc.width = vw;
+      gc.height = vh;
+      gc.style.width = vw + 'px';
+      gc.style.height = vh + 'px';
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    var accent = getComputedStyle(hero).getPropertyValue('--accent-color').trim() || '#1d4ed8';
+    function hexRgb(h) {
+      h = h.replace('#','');
+      return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+    }
+    var rgb = hexRgb(accent);
+
+    // Phases: fadeIn -> circle -> pause -> exit -> done
+    // All durations in ms
+    var FADE_IN   = 800;
+    var CIRCLE    = 4000;   // gentle loop around center
+    var PAUSE     = 1200;   // hold still
+    var EXIT      = 1500;   // drift away and fade
+    var TOTAL     = FADE_IN + CIRCLE + PAUSE + EXIT;
+
+    var startTime = 0;
+    var done = false;
+    var realMouseMoved = false;
+    var cursorX = 0, cursorY = 0, alpha = 0;
+    var ripples = [];
+
+    hero.addEventListener('mousemove', function onReal() {
+      if (!done) realMouseMoved = true;
+      hero.removeEventListener('mousemove', onReal);
+    });
+
+    function getCenter() {
+      var cx = vw / 2;
+      var cy = vh / 2;
+      var sc = vw < 640 ? 0.6 : 1;
+      var rw = 160 * sc;
+      return { cx: cx, cy: cy, rw: rw, sc: sc };
+    }
+
+    function drawCursor(x, y, a) {
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.translate(x, y);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, 19);
+      ctx.lineTo(4.5, 15);
+      ctx.lineTo(8, 22);
+      ctx.lineTo(11, 20.5);
+      ctx.lineTo(7.5, 14);
+      ctx.lineTo(13, 14);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (0.7 * a) + ')';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.9 * a) + ')';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawRipple(x, y, a, r) {
+      ctx.save();
+      ctx.globalAlpha = a * 0.3;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',1)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Easing
+    function easeInOutSine(t) { return -(Math.cos(Math.PI * t) - 1) / 2; }
+    function easeInQuad(t) { return t * t; }
+
+    var lastRippleTime = 0;
+
+    function animate(ts) {
+      if (done) return;
+      if (!startTime) startTime = ts;
+      var elapsed = ts - startTime;
+
+      ctx.clearRect(0, 0, vw, vh);
+
+      // Abort on real mouse
+      if (realMouseMoved) {
+        alpha -= 0.04;
+        if (alpha <= 0) {
+          done = true;
+          gc.style.opacity = '0';
+          if (window.__lidarMouse) {
+            window.__lidarMouse.active = false;
+            window.__lidarMouse.x = -1000;
+            window.__lidarMouse.y = -1000;
+          }
+          return;
+        }
+        drawCursor(cursorX, cursorY, alpha);
+        requestAnimationFrame(animate);
+        return;
+      }
+
+      var c = getCenter();
+      var radius = c.rw * 0.45;  // orbit radius around center
+
+      if (elapsed < FADE_IN) {
+        // Phase 1: Fade in while starting the circle
+        var t = elapsed / FADE_IN;
+        alpha = easeInOutSine(t);
+        var angle = (t * 0.4) * Math.PI * 2;  // partial circle during fade in
+        cursorX = c.cx + Math.cos(angle - Math.PI / 2) * radius * t;
+        cursorY = c.cy + Math.sin(angle - Math.PI / 2) * radius * t;
+
+      } else if (elapsed < FADE_IN + CIRCLE) {
+        // Phase 2: Gentle orbit around center
+        alpha = 1;
+        var ct = (elapsed - FADE_IN) / CIRCLE;
+        var angle = (0.4 + ct * 1.1) * Math.PI * 2;  // ~1.1 full loops
+        // Slowly vary the radius for an organic feel
+        var r = radius * (0.85 + 0.15 * Math.sin(ct * Math.PI * 3));
+        cursorX = c.cx + Math.cos(angle - Math.PI / 2) * r;
+        cursorY = c.cy + Math.sin(angle - Math.PI / 2) * r;
+
+        // Spawn a ripple every ~1200ms
+        if (elapsed - lastRippleTime > 1200) {
+          ripples.push({ x: cursorX, y: cursorY, r: 4, a: 0.7 });
+          lastRippleTime = elapsed;
+        }
+
+      } else if (elapsed < FADE_IN + CIRCLE + PAUSE) {
+        // Phase 3: Hold still
+        alpha = 1;
+        // cursorX/cursorY stay at last position
+
+      } else if (elapsed < TOTAL) {
+        // Phase 4: Drift upward-right and fade out
+        var et = (elapsed - FADE_IN - CIRCLE - PAUSE) / EXIT;
+        alpha = 1 - easeInQuad(et);
+        cursorX += 0.6;
+        cursorY -= 0.4;
+
+      } else {
+        // Done
+        done = true;
+        gc.style.opacity = '0';
+        if (window.__lidarMouse) {
+          window.__lidarMouse.active = false;
+          window.__lidarMouse.x = -1000;
+          window.__lidarMouse.y = -1000;
+        }
+        return;
+      }
+
+      // Feed position to LidarScene
+      if (alpha > 0.1 && elapsed < FADE_IN + CIRCLE + PAUSE) {
+        if (window.__lidarMouse) {
+          window.__lidarMouse.x = cursorX;
+          window.__lidarMouse.y = cursorY;
+          window.__lidarMouse.active = true;
+        }
+      } else if (elapsed >= FADE_IN + CIRCLE + PAUSE) {
+        if (window.__lidarMouse) {
+          window.__lidarMouse.active = false;
+          window.__lidarMouse.x = -1000;
+          window.__lidarMouse.y = -1000;
+        }
+      }
+
+      // Draw ripples
+      for (var ri = ripples.length - 1; ri >= 0; ri--) {
+        var rp = ripples[ri];
+        rp.r += 0.4;
+        rp.a -= 0.008;
+        if (rp.a <= 0) { ripples.splice(ri, 1); continue; }
+        drawRipple(rp.x, rp.y, rp.a * alpha, rp.r);
+      }
+
+      // Draw cursor
+      drawCursor(cursorX, cursorY, alpha);
+
+      // Label during circle + pause phase
+      if (elapsed > FADE_IN + 800 && elapsed < FADE_IN + CIRCLE + PAUSE) {
+        var la = Math.min(1, (elapsed - FADE_IN - 800) / 600) * alpha;
+        ctx.save();
+        ctx.globalAlpha = la * 0.75;
+        ctx.font = '500 13px system-ui, -apple-system, sans-serif';
+        ctx.fillStyle = 'rgba(55, 65, 81, 0.9)';
+        ctx.fillText('try moving your cursor here', cursorX + 18, cursorY - 8);
+        ctx.restore();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Start after 1.5s (page fade-in animations finish)
+    setTimeout(function () {
+      if (done) return;
+      gc.style.opacity = '1';
+      requestAnimationFrame(animate);
+    }, 1500);
   })();
 </script>
 
@@ -705,6 +990,106 @@ const interactiveBg: string = 'network';
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .mouse-dot { animation: none; opacity: 0.8; }
+    .interaction-hint { animation: none !important; }
+  }
+
+  /* Interaction hint tooltip */
+  .interaction-hint {
+    position: absolute;
+    bottom: 6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 9999px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(55, 65, 81, 0.9);
+    white-space: nowrap;
+    pointer-events: auto;
+    cursor: default;
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+  }
+
+  .interaction-hint.hint-visible {
+    visibility: visible;
+    animation: hintSlideIn 0.5s ease-out forwards;
+    animation-delay: 0.8s;
+  }
+
+  .interaction-hint.hint-fading {
+    animation: hintFadeOut 0.6s ease-in forwards;
+  }
+
+  .hint-icon {
+    flex-shrink: 0;
+    color: var(--accent-color, #1d4ed8);
+    animation: hintPulse 2s ease-in-out infinite;
+    animation-delay: 1.3s;
+  }
+
+  @keyframes hintSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  @keyframes hintFadeOut {
+    from {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-6px);
+    }
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  @media (min-width: 768px) {
+    .interaction-hint.hint-visible {
+      display: flex;
+    }
+  }
+
+  /* Ghost cursor canvas */
+  .ghost-cursor-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  @media (max-width: 767px) {
+    .ghost-cursor-canvas {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ghost-cursor-canvas {
+      display: none;
+    }
   }
 
 
