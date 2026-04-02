@@ -13,16 +13,21 @@
   let W, H, CX, CY;
   let SCALE = 1;
   let RW = 160;
+  let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
   function resize() {
     let oldCX = CX;
     let oldCY = CY;
     let oldScale = SCALE;
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
     W = canvas.parentElement.clientWidth || window.innerWidth;
     H = canvas.parentElement.clientHeight || window.innerHeight;
-    canvas.width = W;
-    canvas.height = H;
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     CX = W / 2;
     CY = H / 2;
     SCALE = W < 640 ? 0.6 : 1;
