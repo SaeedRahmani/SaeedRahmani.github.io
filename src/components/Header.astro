@@ -11,8 +11,15 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
   id="header"
   class="fixed top-0 left-0 right-0 z-50 block transition-all duration-300"
 >
-  <nav class="max-w-7xl mx-auto px-2 md:px-8 py-3 w-full">
-    <ul class="flex items-center gap-3 sm:gap-4 md:gap-8 justify-start sm:justify-center overflow-x-auto flex-nowrap scrollbar-hide">
+  <nav class="max-w-7xl mx-auto px-2 md:px-8 py-3 w-full flex items-center justify-between">
+    <a
+      href="#"
+      class="text-sm font-semibold text-gray-900 whitespace-nowrap hover:text-[var(--accent-color)] transition-colors duration-200 flex-shrink-0"
+      style={`--accent-color: ${siteConfig.accentColor}`}
+    >
+      {siteConfig.name}
+    </a>
+    <ul class="flex items-center gap-3 sm:gap-4 md:gap-8 justify-end overflow-x-auto flex-nowrap scrollbar-hide">
       <li>
         <a
           href="#about"
