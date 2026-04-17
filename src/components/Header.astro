@@ -10,8 +10,9 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
 <header
   id="header"
   class="fixed top-0 left-0 right-0 z-50 block transition-all duration-300"
+  style={`--accent-color: ${siteConfig.accentColor}`}
 >
-  <nav class="mx-auto px-6 lg:px-14 py-3 w-full flex items-center justify-between">
+  <nav class="relative mx-auto px-6 lg:px-14 py-3 w-full flex items-center justify-between">
     <a
       href="#"
       class="text-sm font-medium text-gray-700 whitespace-nowrap hover:text-black transition-colors duration-200 flex-shrink-0"
@@ -19,7 +20,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
     >
       {siteConfig.name}
     </a>
-    <ul class="flex items-center gap-3 sm:gap-4 md:gap-8 justify-end overflow-x-auto flex-nowrap scrollbar-hide">
+    <ul id="nav-list" class="flex items-center gap-3 sm:gap-4 md:gap-8 justify-end overflow-x-auto flex-nowrap scrollbar-hide">
       <li>
         <a
           href="#about"
@@ -89,6 +90,7 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
 </header>
 
 <script>
+  // Frosted-glass header on scroll
   window.addEventListener("scroll", () => {
     const header = document.getElementById("header");
     if (window.scrollY > 100) {
@@ -97,6 +99,69 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
       header?.classList.remove("bg-white/80", "backdrop-blur-sm");
     }
   });
+
+  // Sliding highlight pill for nav items
+  (function () {
+    const nav = document.querySelector<HTMLElement>('#header nav');
+    const ul  = document.getElementById('nav-list');
+    if (!nav || !ul || window.matchMedia('(hover: none)').matches) return;
+
+    // Resolve accent color for the pill
+    const header  = document.getElementById('header')!;
+    const accent  = getComputedStyle(header).getPropertyValue('--accent-color').trim() || '#1d4ed8';
+    const m       = accent.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+    const bg      = m
+      ? `rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},0.12)`
+      : 'rgba(29,78,216,0.12)';
+
+    const hl = document.createElement('span');
+    hl.setAttribute('aria-hidden', 'true');
+    Object.assign(hl.style, {
+      position: 'absolute',
+      borderRadius: '8px',
+      background: bg,
+      transition: 'opacity 0.12s ease',
+      opacity: '0',
+      pointerEvents: 'none',
+      zIndex: '0',
+    });
+    // Attach to nav so ul's overflow-x clipping doesn't affect it
+    nav.appendChild(hl);
+
+    const PAD_X = 8, PAD_Y = 4;
+    let active = false;
+
+    function move(el: HTMLElement) {
+      const navRect = nav.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      hl.style.left   = (r.left - navRect.left - PAD_X) + 'px';
+      hl.style.top    = (r.top  - navRect.top  - PAD_Y) + 'px';
+      hl.style.width  = (r.width  + PAD_X * 2) + 'px';
+      hl.style.height = (r.height + PAD_Y * 2) + 'px';
+      if (!active) {
+        // Snap to first item instantly, then enable sliding
+        hl.style.opacity = '1';
+        requestAnimationFrame(() => {
+          hl.style.transition = 'left 0.2s ease, top 0.2s ease, width 0.2s ease, height 0.2s ease, opacity 0.12s ease';
+        });
+        active = true;
+      } else {
+        hl.style.opacity = '1';
+      }
+    }
+
+    ul.querySelectorAll<HTMLAnchorElement>('a').forEach(a => {
+      a.style.position = 'relative';
+      a.style.zIndex = '1';
+      a.addEventListener('mouseenter', () => move(a));
+    });
+
+    ul.addEventListener('mouseleave', () => {
+      hl.style.opacity = '0';
+      hl.style.transition = 'opacity 0.12s ease';
+      active = false;
+    });
+  })();
 </script>
 
 <style>
