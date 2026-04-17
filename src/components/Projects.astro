@@ -1,15 +1,6 @@
 ---
 import { siteConfig } from "../config";
 const hasProjects = siteConfig.projects && siteConfig.projects.length > 0;
-
-const gradients: [string, string][] = [
-  ["#3b82f6", "#6366f1"],
-  ["#8b5cf6", "#ec4899"],
-  ["#10b981", "#0d9488"],
-  ["#f59e0b", "#ef4444"],
-  ["#06b6d4", "#3b82f6"],
-  ["#7c3aed", "#a855f7"],
-];
 ---
 
 {
@@ -28,53 +19,59 @@ const gradients: [string, string][] = [
           </div>
 
           <div class="lg:col-span-9">
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {siteConfig.projects.map((project, index) => {
                 const Component = project.link ? "a" : "div";
                 const linkProps = project.link
-                  ? {
-                      href: project.link,
-                      target: "_blank",
-                      rel: "noopener noreferrer",
-                    }
+                  ? { href: project.link, target: "_blank", rel: "noopener noreferrer" }
                   : {};
-                const [fromColor, toColor] = gradients[index % gradients.length];
 
                 return (
                   <Component
                     {...linkProps}
-                    class="group block rounded-xl border border-gray-200 overflow-hidden bg-white hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+                    class="group relative flex flex-col rounded-2xl border border-gray-100 bg-white overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    {/* Thumbnail */}
-                    {project.image ? (
-                      <div class="h-36 overflow-hidden">
-                        <img
-                          src={project.image}
-                          alt={project.name}
-                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        class="h-36 flex items-center justify-center"
-                        style={`background: linear-gradient(135deg, ${fromColor}, ${toColor})`}
-                      >
-                        <span class="text-4xl">{project.emoji || "🔬"}</span>
-                      </div>
-                    )}
+                    {/* Top accent bar */}
+                    <div
+                      class="h-1 w-full"
+                      style={`background: linear-gradient(to right, ${siteConfig.accentColor}, ${siteConfig.accentColor}60)`}
+                    />
 
-                    {/* Card body */}
-                    <div class="p-3.5">
-                      <h3 class="font-semibold text-gray-900 text-sm leading-snug mb-1.5 line-clamp-2">
+                    <div class="flex flex-col flex-1 p-4 gap-3">
+                      {/* Header row: emoji + index */}
+                      <div class="flex items-start justify-between">
+                        <span
+                          class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                          style={`background-color: ${siteConfig.accentColor}10`}
+                        >
+                          {project.emoji || "🔬"}
+                        </span>
+                        <span
+                          class="text-[11px] font-bold tabular-nums"
+                          style={`color: ${siteConfig.accentColor}70`}
+                        >
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 class="text-sm font-semibold text-gray-900 leading-snug group-hover:text-blue-700 transition-colors duration-150 line-clamp-2">
                         {project.name}
                       </h3>
-                      <p class="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-3">
+
+                      {/* Description */}
+                      <p class="text-xs text-gray-500 leading-relaxed line-clamp-3 flex-1">
                         {project.description}
                       </p>
+
+                      {/* Skills */}
                       {project.skills && project.skills.length > 0 && (
-                        <div class="flex flex-wrap gap-1">
+                        <div class="flex flex-wrap gap-1 pt-1 border-t border-gray-50">
                           {project.skills.map((skill) => (
-                            <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">
+                            <span
+                              class="px-2 py-0.5 text-[11px] font-medium rounded-full border"
+                              style={`color: ${siteConfig.accentColor}; border-color: ${siteConfig.accentColor}30; background-color: ${siteConfig.accentColor}08`}
+                            >
                               {skill}
                             </span>
                           ))}

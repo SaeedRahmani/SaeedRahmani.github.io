@@ -5,8 +5,8 @@ on:
     branches: [ main ]
   workflow_dispatch:
   schedule:
-    # Rebuild every Monday at 06:00 UTC to pull fresh Semantic Scholar data
-    - cron: '0 6 * * 1'
+    # Rebuild every day at 06:00 UTC to pull fresh Semantic Scholar data
+    - cron: '0 6 * * *'
 
 permissions:
   contents: read
