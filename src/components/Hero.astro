@@ -149,7 +149,7 @@ const hintMode: string = 'tooltip';
     {activeViz === 'birds-eye' ? <BirdsEyeScene /> : activeViz === 'lidar' ? <LidarScene /> : <PathPlanningGrid />}
   </div>
 
-  <div class="h-full mx-auto p-8 sm:p-12 md:p-24 flex items-center relative z-10">
+  <div class="h-full mx-auto px-6 lg:px-14 py-8 sm:py-12 md:py-24 flex items-center relative z-10">
     <div class="w-full max-w-2xl">
         <h2
           class="text-pretty text-xl sm:text-2xl md:text-5xl font-bold tracking-tight text-gray-700 animate-fade-in"
@@ -171,7 +171,7 @@ const hintMode: string = 'tooltip';
     </div>
   </div>
   <div
-    class="absolute z-20 bottom-0 left-0 right-0 p-8 sm:p-12 md:p-24 flex gap-x-4 sm:gap-x-6 md:gap-x-8 text-gray-700 animate-fade-in animation-delay-600"
+    class="absolute z-20 bottom-0 left-0 right-0 px-6 lg:px-14 py-8 sm:py-12 md:py-24 flex gap-x-4 sm:gap-x-6 md:gap-x-8 text-gray-700 animate-fade-in animation-delay-600"
   >
     {
       siteConfig.social?.email && (
