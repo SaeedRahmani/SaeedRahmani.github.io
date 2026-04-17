@@ -163,21 +163,11 @@ const PREVIEW = 9;
                       <span class="block text-xs text-gray-400 italic mt-0.5">{pub.venue}</span>
                     )}
                   </span>
-                  <div class="flex items-center gap-1 flex-shrink-0 mt-0.5">
-                    {pub.citationCount && (
-                      <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded border border-blue-100 font-medium" title="Citation count from Semantic Scholar">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                        {pub.citationCount}
-                      </span>
-                    )}
-                    {pub.award && (
-                      <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200" title={pub.award}>
-                        🏆
-                      </span>
-                    )}
-                  </div>
+                  {pub.award && (
+                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200 flex-shrink-0 mt-0.5" title={pub.award}>
+                      🏆
+                    </span>
+                  )}
                 </div>
               ))}
 
@@ -202,21 +192,11 @@ const PREVIEW = 9;
                           <span class="block text-xs text-gray-400 italic mt-0.5">{pub.venue}</span>
                         )}
                       </span>
-                      <div class="flex items-center gap-1 flex-shrink-0 mt-0.5">
-                        {pub.citationCount && (
-                          <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded border border-blue-100 font-medium" title="Citation count from Semantic Scholar">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                            </svg>
-                            {pub.citationCount}
-                          </span>
-                        )}
-                        {pub.award && (
-                          <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200" title={pub.award}>
-                            🏆
-                          </span>
-                        )}
-                      </div>
+                      {pub.award && (
+                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200 flex-shrink-0 mt-0.5" title={pub.award}>
+                          🏆
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
