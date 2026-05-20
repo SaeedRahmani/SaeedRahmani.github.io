@@ -167,6 +167,10 @@ export const siteConfig = {
   ],
   news: [
     {
+      date: "May. 20, 2026",
+      html: `I will be giving a talk at <a href="https://www.tue.nl/en/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Eindhoven University of Technology</a> about self-play RL for autonomous driving.`,
+    },
+    {
       date: "Apr. 1, 2026",
       html: `Gave a talk at <a href="https://Waymo.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Waymo UK</a> about <a href="https://nomaddrive.github.io/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">NOMAD</a>.`,
     },
