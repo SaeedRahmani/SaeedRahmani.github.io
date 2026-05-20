@@ -168,7 +168,7 @@ export const siteConfig = {
   news: [
     {
       date: "May. 20, 2026",
-      html: `I will be giving a talk at <a href="https://www.tue.nl/en/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Eindhoven University of Technology</a> about self-play RL for autonomous driving.`,
+      html: `I will be giving a talk at <a href="https://www.tue.nl/en/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Eindhoven University of Technology</a> about <strong>self-play RL</strong> for autonomous driving.`,
     },
     {
       date: "Apr. 1, 2026",
