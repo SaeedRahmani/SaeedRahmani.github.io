@@ -66,12 +66,9 @@ if (siteConfig.semanticScholarId) {
         const doi = p.externalIds?.DOI;
         const arxiv = p.externalIds?.ArXiv;
 
-        // Derive a meaningful venue label
-        let venueLabel = p.venue ?? "";
-        if (!venueLabel || venueLabel === "arXiv.org") {
-          venueLabel = arxiv ? "arXiv preprint" : doi ? "Preprint" : "";
-        }
-
+        // Deriving venue label omitted; no longer automatically adding missing papers
+        // to prevent unwanted papers from showing up.
+        /*
         configPubs.push({
           title: p.title,
           year: String(p.year),
@@ -79,12 +76,13 @@ if (siteConfig.semanticScholarId) {
           venue: venueLabel,
           type: isJournal ? "Journal" : "Conference",
           link: doi
-            ? `https://doi.org/${doi}`
+            ? \`https://doi.org/\${doi}\`
             : arxiv
-              ? `https://arxiv.org/abs/${arxiv}`
-              : `https://www.semanticscholar.org/paper/${p.paperId}`,
+              ? \`https://arxiv.org/abs/\${arxiv}\`
+              : \`https://www.semanticscholar.org/paper/\${p.paperId}\`,
           citationCount: p.citationCount > 0 ? p.citationCount : undefined,
         });
+        */
       }
     }
   } catch {
