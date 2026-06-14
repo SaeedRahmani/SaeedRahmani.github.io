@@ -223,7 +223,7 @@ export const siteConfig = {
     {
       school: "Delft University of Technology, Netherlands",
       degree: "PhD Candidate in AI for Autonomous Vehicles",
-      dateRange: "Jan 2022 - Jan 2026",
+      dateRange: "2022 - present",
       achievements: [
         "Advisors: Prof. Bart van Arem, Dr. Simeon C. Calvert",
         "IES IROS SYPA Award 2025",
@@ -233,7 +233,7 @@ export const siteConfig = {
     {
       school: "Oxford University, United Kingdom",
       degree: "PhD Candidate (Exchange)",
-      dateRange: "Aug 2025 - Jan 2026",
+      dateRange: "2025 - present",
       achievements: [
         "Research Topic: Multi-agent self-play reinforcement learning for generalizable agents",
         "Advisors: Prof. Shimon Whiteson, Prof. Jakob Foerster",
