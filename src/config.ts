@@ -311,7 +311,7 @@ export const siteConfig = {
         "Edge Case Detection in Automated Driving: Methods, Challenges and Future Directions",
       authors:
         "Rahmani, S., Rieder, S., Gelder, E., Sonntag, M., Mallada, J. L., Kalisvaart, S., Hashemi, V., Calvert, S. C.",
-      venue: "Under Review at IEEE T-ITS",
+      venue: "IEEE Transactions on Intelligent Transportation Systems (under review)",
       year: "2024",
       type: "Journal",
       link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
@@ -349,13 +349,6 @@ export const siteConfig = {
       link: "https://arxiv.org/abs/2602.15891",
     },
     {
-      title: "Safe and Efficient Autonomous Driving at Unsignalized Intersections: An Integrated Model Predictive Control and Reinforcement Learning Approach",
-      authors: "Saeed Rahmani, et al.",
-      venue: "Submitted to Journal",
-      year: "2025",
-      type: "Journal",
-    },
-    {
       title: "A Framework for Human-Reason-Based Trajectory Evaluation in Automated Vehicles",
       authors: "Saeed Rahmani, et al.",
       venue: "2025 5th International Conference on Robotics, Automation, and Artificial Intelligence (RAAI)",
@@ -382,7 +375,7 @@ export const siteConfig = {
     {
       title: "Decentralized Modeling of Vehicular Maneuvers and Interactions at Urban Junctions",
       authors: "Saeed Rahmani, et al.",
-      venue: "arXiv preprint",
+      venue: "Transportation Research Part B",
       year: "2025",
       type: "Conference",
       link: "https://arxiv.org/abs/2507.21547",
