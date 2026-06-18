@@ -167,6 +167,10 @@ export const siteConfig = {
   ],
   news: [
     {
+      date: "Jun. 17, 2026",
+      html: `Our paper <strong>DiscoGen</strong> has been accepted to <a href="https://icml.cc/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">ICML 2026</a> in <strong>Seoul, South Korea</strong>! Read the preprint on <a href="https://arxiv.org/abs/2603.17863" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">arXiv</a>.`,
+    },
+    {
       date: "May. 20, 2026",
       html: `I will be giving a talk at <a href="https://www.tue.nl/en/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Eindhoven University of Technology</a> about <strong>self-play RL</strong> for autonomous driving.`,
     },
