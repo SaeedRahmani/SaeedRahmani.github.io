@@ -8,7 +8,7 @@ export const siteConfig = {
   social: {
     email: "saeed.rahmani@cs.ox.ac.uk",
     linkedin: "https://www.linkedin.com/in/saeedrahmani/",
-    twitter: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+    twitter: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     github: "https://github.com/SaeedRahmani",
   },
   aboutMe:
@@ -268,7 +268,7 @@ export const siteConfig = {
       venue: "IEEE Transactions on Intelligent Transportation Systems",
       year: "2023",
       type: "Journal",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+      link: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     },
     {
       title:
@@ -279,7 +279,7 @@ export const siteConfig = {
       year: "2023",
       type: "Conference",
       award: "Best Student Paper Runner-up Award",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+      link: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     },
     {
       title:
@@ -289,7 +289,7 @@ export const siteConfig = {
       venue: "IEEE IROS 2025",
       year: "2025",
       type: "Conference",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+      link: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     },
     {
       title:
@@ -299,7 +299,7 @@ export const siteConfig = {
       venue: "IEEE RAAI 2025",
       year: "2025",
       type: "Conference",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+      link: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     },
     {
       title:
@@ -308,7 +308,7 @@ export const siteConfig = {
       venue: "TRR Journal",
       year: "2025",
       type: "Journal",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+      link: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     },
     {
       title:
@@ -318,7 +318,7 @@ export const siteConfig = {
       venue: "IEEE Transactions on Intelligent Transportation Systems (under review)",
       year: "2024",
       type: "Journal",
-      link: "https://scholar.google.com/citations?user=H9yGoHcAAAAJ&hl=en",
+      link: "https://scholar.google.com/citations?hl=en&user=H9yGoHcAAAAJ&view_op=list_works&sortby=pubdate",
     },
     {
       title: "Procedural Generation of Algorithm Discovery Tasks in Machine Learning",
