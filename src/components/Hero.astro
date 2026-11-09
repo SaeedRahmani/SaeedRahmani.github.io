@@ -151,11 +151,11 @@ const hintMode: string = 'tooltip';
 
   <div class="h-full mx-auto px-6 lg:px-14 py-8 sm:py-12 md:py-24 flex items-center relative z-10">
     <div class="w-full max-w-2xl">
-        <h2
+        <p
           class="text-pretty text-xl sm:text-2xl md:text-5xl font-bold tracking-tight text-gray-700 animate-fade-in"
         >
           Hello! 👋
-        </h2>
+        </p>
         <h1
           class="mt-6 sm:mt-8 md:mt-10 text-pretty text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight text-gray-800 animate-fade-in animation-delay-200"
         >
@@ -294,7 +294,7 @@ const hintMode: string = 'tooltip';
     }
   </div>
   <!-- Full-hero animated network background -->
-  <div class="absolute inset-0 pointer-events-none" style="z-index: -5;">
+  <div class="absolute inset-0 pointer-events-none" style="z-index: -5;" aria-hidden="true">
     <canvas id="hero-net" class="w-full h-full"></canvas>
   </div>
   <!-- Interaction hint tooltip (desktop only) -->
@@ -314,7 +314,7 @@ const hintMode: string = 'tooltip';
   <canvas id="ghost-cursor-canvas" class="ghost-cursor-canvas" aria-hidden="true"></canvas>
 
   <!-- Modern scroll indicator -->
-  <div id="scroll-indicator" class="scroll-indicator-container">
+  <div id="scroll-indicator" class="scroll-indicator-container" aria-hidden="true">
     <div class="mouse-shape">
       <div class="mouse-dot"></div>
     </div>
@@ -621,8 +621,31 @@ const hintMode: string = 'tooltip';
     let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     let vw = 0, vh = 0;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let running = true;
-    document.addEventListener('visibilitychange', () => { running = document.visibilityState === 'visible'; });
+
+    // Animate only while the tab is visible and the hero is on screen
+    let pageVisible = document.visibilityState === 'visible';
+    let heroOnScreen = true;
+    let rafId = 0;
+    let step = null; // per-frame draw function of the active background (set below)
+    function loop() {
+      rafId = 0;
+      if (!pageVisible || !heroOnScreen || prefersReduced || !step) return;
+      step();
+      rafId = requestAnimationFrame(loop);
+    }
+    function start() {
+      if (!rafId) rafId = requestAnimationFrame(loop);
+    }
+    document.addEventListener('visibilitychange', () => {
+      pageVisible = document.visibilityState === 'visible';
+      start();
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        heroOnScreen = entries[entries.length - 1].isIntersecting;
+        start();
+      }).observe(hero);
+    }
 
     const mouse = { x: -9999, y: -9999, inside: false };
     hero.addEventListener('mousemove', (e) => {
@@ -703,30 +726,32 @@ const hintMode: string = 'tooltip';
         if (n.y > vh + 10) n.y = -10;
       }
       function drawFrame() {
-        if (!running || prefersReduced) return;
         ctx.clearRect(0, 0, vw, vh);
 
         for (let i = 0; i < nodes.length; i++) updateNode(nodes[i]);
 
+        // Links are drawn black at low alpha. (They were meant to use the accent colour,
+        // but a shadowed variable made that colour string invalid, so canvas ignored it
+        // and they have always rendered black. Kept as-is to preserve the look.)
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        const maxDist2 = maxDist * maxDist;
         for (let i = 0; i < nodes.length; i++) {
           const a = nodes[i];
           for (let j = i + 1; j < nodes.length; j++) {
-            const b = nodes[j];
-            const dx = a.x - b.x, dy = a.y - b.y;
-            const dist = Math.hypot(dx, dy);
-            if (dist < maxDist) {
-              const t = 1 - dist / maxDist;
-              ctx.globalAlpha = 0.08 * t;
-              ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 1)`;
-              ctx.lineWidth = 1;
-              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            const o = nodes[j];
+            const dx = a.x - o.x, dy = a.y - o.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < maxDist2) {
+              ctx.globalAlpha = 0.08 * (1 - Math.sqrt(d2) / maxDist);
+              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(o.x, o.y); ctx.stroke();
             }
           }
         }
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
         for (let i = 0; i < nodes.length; i++) {
           const n = nodes[i];
-          ctx.globalAlpha = 0.9;
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
           ctx.beginPath(); ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2); ctx.fill();
         }
 
@@ -742,11 +767,10 @@ const hintMode: string = 'tooltip';
         ctx.rect(0, CY - RW/2, vw, RW);
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
-
-        requestAnimationFrame(drawFrame);
       }
       resize();
-      if (!prefersReduced) requestAnimationFrame(drawFrame);
+      step = drawFrame;
+      start();
       window.addEventListener('resize', () => {
         dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
         resize();
@@ -807,7 +831,6 @@ const hintMode: string = 'tooltip';
         d.y += d.vy;
       }
       function drawFrame() {
-        if (!running || prefersReduced) return;
         ctx.clearRect(0, 0, vw, vh);
 
         for (let i = 0; i < dots.length; i++) {
@@ -846,11 +869,10 @@ const hintMode: string = 'tooltip';
         ctx.rect(0, CY - RW/2, vw, RW);
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
-
-        requestAnimationFrame(drawFrame);
       }
       resize();
-      if (!prefersReduced) requestAnimationFrame(drawFrame);
+      step = drawFrame;
+      start();
       window.addEventListener('resize', () => {
         dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
         resize();

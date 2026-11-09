@@ -15,6 +15,13 @@
   let RW = 160;
   let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
+  // Animate only while the tab is visible and the scene is on screen;
+  // with reduced motion, show a single still frame instead.
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let pageVisible = document.visibilityState === 'visible';
+  let onScreen = true;
+  let rafId = 0;
+
   function resize() {
     let oldCX = CX;
     let oldCY = CY;
@@ -53,6 +60,9 @@
     }
 
     if (ego && ego.y > H + 100 * SCALE) ego.y = -300 * SCALE;
+
+    // Resizing clears the canvas; repaint the still frame when not animating
+    if (prefersReduced && oldCX !== undefined) { update(); draw(); }
   }
   
   window.addEventListener('resize', resize);
@@ -355,17 +365,38 @@
   }
 
   function frame() {
+    rafId = 0;
+    if (!pageVisible || !onScreen) return;
     if (W && H) {
       update();
       draw();
     }
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
+  }
+  function start() {
+    if (!rafId && !prefersReduced) rafId = requestAnimationFrame(frame);
+  }
+  document.addEventListener('visibilitychange', () => {
+    pageVisible = document.visibilityState === 'visible';
+    start();
+  });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      onScreen = entries[entries.length - 1].isIntersecting;
+      start();
+    }).observe(canvas);
   }
 
   resize();
   ego.y = -300 * SCALE;
   spawnCrossVehicles();
-  frame();
+  if (prefersReduced) {
+    // Advance the simulation a little so the still frame shows cars and LiDAR returns
+    for (let i = 0; i < 150; i++) update();
+    draw();
+  } else {
+    frame();
+  }
   setTimeout(() => { canvas.style.opacity = '1'; }, 300);
 })();
 </script>

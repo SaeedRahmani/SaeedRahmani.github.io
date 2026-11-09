@@ -15,8 +15,9 @@ import "../styles/global.css";
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={siteConfig.description} />
@@ -37,40 +38,50 @@ import "../styles/global.css";
     <meta property="og:url" content="https://saeedrahmani.github.io/" />
     <meta property="og:site_name" content="Saeed Rahmani" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://saeedrahmani.github.io/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Saeed Rahmani's website: This is Saeed, PhD Candidate | AI & Autonomous Driving" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Saeed Rahmani - PhD Candidate | AI & Autonomous Driving" />
     <meta name="twitter:description" content={siteConfig.description} />
-    
+    <meta name="twitter:image" content="https://saeedrahmani.github.io/og-image.jpg" />
+
     <!-- JSON-LD Structured Data for Person -->
-    <script type="application/ld+json" set:html={JSON.stringify({
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Person",
       "name": "Saeed Rahmani",
-      "url": "https://saeedrahmani.github.io",
+      "url": "https://saeedrahmani.github.io/",
+      "description": siteConfig.description,
       "email": "saeed.rahmani@cs.ox.ac.uk",
       "jobTitle": "PhD Candidate",
       "worksFor": [
         {
-          "@type": "Organization",
+          "@type": "CollegeOrUniversity",
           "name": "University of Oxford",
           "url": "https://www.ox.ac.uk"
         },
         {
-          "@type": "Organization",
+          "@type": "CollegeOrUniversity",
           "name": "TU Delft",
           "url": "https://www.tudelft.nl"
         }
       ],
       "alumniOf": [
         {
-          "@type": "Organization",
+          "@type": "CollegeOrUniversity",
           "name": "University of Oxford"
         },
         {
-          "@type": "Organization",
+          "@type": "CollegeOrUniversity",
           "name": "TU Delft"
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Iran University of Science and Technology"
         }
       ],
       "knowsAbout": ["Artificial Intelligence", "Autonomous Vehicles", "Reinforcement Learning", "Foundation Models", "World Models", "Multi-Agent Systems"],
@@ -81,17 +92,15 @@ import "../styles/global.css";
       ]
     })} />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Self-hosted fonts (see global.css); preload the faces used above the fold -->
+    <link rel="preload" href="/fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-mono-700-latin.woff2" as="font" type="font/woff2" crossorigin />
     <title>Saeed Rahmani - {siteConfig.title}</title>
   </head>
   <body>
     <Header />
-    <section>
+    <main>
       <Hero />
       <About />
       <News />
@@ -99,7 +108,7 @@ import "../styles/global.css";
       <Publications />
       <Projects />
       <Education />
-    </section>
+    </main>
     <Footer />
   </body>
 </html>

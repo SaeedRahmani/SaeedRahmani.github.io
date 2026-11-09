@@ -22,7 +22,12 @@ const hasEducation = siteConfig.education && siteConfig.education.length > 0;
           <div class="lg:col-span-9 border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
             {siteConfig.education.map((edu) => (
               <div class="edu-row bg-white">
-                <div class="flex items-center justify-between px-4 py-3 select-none">
+                <div
+                  class="edu-trigger flex items-center justify-between px-4 py-3 select-none focus-visible:-outline-offset-2"
+                  role="button"
+                  tabindex="0"
+                  aria-expanded="false"
+                >
                   <div class="flex items-center gap-3 min-w-0 flex-1">
                     <span class="font-medium text-gray-900 text-sm truncate">
                       {edu.school}
@@ -115,8 +120,19 @@ const hasEducation = siteConfig.education && siteConfig.education.length > 0;
 
 <script>
   document.querySelectorAll(".edu-row").forEach((row) => {
-    row.addEventListener("click", () => {
-      row.classList.toggle("is-open");
+    const trigger = row.querySelector(".edu-trigger");
+    const toggleRow = () => {
+      const open = row.classList.toggle("is-open");
+      trigger?.setAttribute("aria-expanded", String(open));
+    };
+    row.addEventListener("click", toggleRow);
+    // Keyboard support: Enter / Space toggle the row like a click
+    trigger?.addEventListener("keydown", (e) => {
+      const key = (e as KeyboardEvent).key;
+      if (key === "Enter" || key === " ") {
+        e.preventDefault();
+        toggleRow();
+      }
     });
   });
 </script>

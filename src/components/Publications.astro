@@ -205,6 +205,9 @@ const PREVIEW = 9;
             {pubs.length > PREVIEW && (
               <button
                 id="pub-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="pub-extras"
                 class="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors duration-150 bg-white"
               >
                 <span id="pub-toggle-label">Show {pubs.length - PREVIEW} more</span>
@@ -232,6 +235,7 @@ const PREVIEW = 9;
     toggle.addEventListener("click", () => {
       const isHidden = extras.classList.contains("hidden");
       extras.classList.toggle("hidden", !isHidden);
+      toggle.setAttribute("aria-expanded", String(isHidden));
       label.textContent = isHidden ? "Show less" : `Show ${moreCount} more`;
       chevron.style.transform = isHidden ? "rotate(180deg)" : "";
     });

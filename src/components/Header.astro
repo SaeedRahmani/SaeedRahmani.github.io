@@ -90,15 +90,19 @@ const hasPublications = siteConfig.publications && siteConfig.publications.lengt
 </header>
 
 <script>
-  // Frosted-glass header on scroll
-  window.addEventListener("scroll", () => {
-    const header = document.getElementById("header");
-    if (window.scrollY > 100) {
-      header?.classList.add("bg-white/80", "backdrop-blur-sm");
-    } else {
-      header?.classList.remove("bg-white/80", "backdrop-blur-sm");
-    }
-  });
+  // Frosted-glass header on scroll (only touches the DOM when the state flips;
+  // also runs once on load so a page opened mid-scroll gets the frosted header)
+  const frostHeader = document.getElementById("header");
+  let frosted = false;
+  function updateHeader() {
+    const next = window.scrollY > 100;
+    if (next === frosted) return;
+    frosted = next;
+    frostHeader?.classList.toggle("bg-white/80", next);
+    frostHeader?.classList.toggle("backdrop-blur-sm", next);
+  }
+  window.addEventListener("scroll", updateHeader, { passive: true });
+  updateHeader();
 
   // Sliding highlight pill for nav items
   (function () {

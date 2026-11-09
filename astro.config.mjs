@@ -8,6 +8,11 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: 'https://SaeedRahmani.github.io',
 
+  // Single-page site: inlining the CSS removes a render-blocking request.
+  build: {
+    inlineStylesheets: 'always',
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },
