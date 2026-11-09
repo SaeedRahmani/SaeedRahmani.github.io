@@ -29,8 +29,8 @@ export const siteConfig = {
       logo: "/logos/oxford.png",
       images: ["/images/oxford-1.jpg", "/images/oxford-2.jpg"],
       bullets: [
-        "Developed PlanNudge, a lightweight RL nudge policy that corrects a frozen diffusion-based driving planner, matching or exceeding the previous state-of-the-art RL finetuning method on all six nuPlan benchmarks with ~6x fewer environment steps (submitted to CVPR 2027)",
-        "Developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement (NeurIPS 2026)",
+        "Co-developed PlanNudge, a lightweight RL nudge policy that corrects a frozen diffusion-based driving planner, matching or exceeding the previous state-of-the-art RL finetuning method on all six nuPlan benchmarks with ~6x fewer environment steps (submitted to CVPR 2027)",
+        "Co-developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement (NeurIPS 2026)",
         "Co-developed DiscoGen, a procedural generator of algorithm discovery tasks across ML domains including RL, vision, language modeling, and trajectory prediction (ICML 2026)",
         "Implemented behavior cloning (BC) policies in complex and uncertain environments with more than 60 agents in each scenario",
       ],
