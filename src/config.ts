@@ -29,8 +29,10 @@ export const siteConfig = {
       logo: "/logos/oxford.png",
       images: ["/images/oxford-1.jpg", "/images/oxford-2.jpg"],
       bullets: [
-        "Developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement",
+        "Developed a Self-play MARL framework for improving the performance of agents transferred from one environment to another, achieving 80-120% success rate improvement (NeurIPS 2026)",
         "Implemented behavior cloning (BC) policies in complex and uncertain environments with more than 60 agents in each scenario",
+        "Co-developed DiscoGen, a procedural generator of algorithm discovery tasks across ML domains including RL, vision, language modeling, and trajectory prediction (ICML 2026)",
+        "Developed PlanNudge, a lightweight RL nudge policy that corrects a frozen diffusion-based driving planner, matching or exceeding the previous state-of-the-art RL finetuning method on all six nuPlan benchmarks with ~6x fewer environment steps (submitted to CVPR 2027)",
       ],
     },
     {
@@ -166,6 +168,10 @@ export const siteConfig = {
     },
   ],
   news: [
+    {
+      date: "Sep. 20, 2026",
+      html: `Our paper <strong>NOMAD</strong> has been accepted to <a href="https://neurips.cc/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">NeurIPS 2026</a>! Check out the <a href="https://nomaddrive.github.io/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">project page</a> and the preprint on <a href="https://arxiv.org/abs/2602.15891" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">arXiv</a>.`,
+    },
     {
       date: "Jun. 17, 2026",
       html: `Our paper <strong>DiscoGen</strong> has been accepted to <a href="https://icml.cc/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">ICML 2026</a> in <strong>Seoul, South Korea</strong>! Read the preprint on <a href="https://arxiv.org/abs/2603.17863" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">arXiv</a>.`,
@@ -347,7 +353,7 @@ export const siteConfig = {
     {
       title: "Learning to Drive in New Cities Without Human Demonstrations",
       authors: "Saeed Rahmani, et al.",
-      venue: "NeurIPS 2026 (submitted)",
+      venue: "NeurIPS 2026",
       year: "2026",
       type: "Conference",
       link: "https://arxiv.org/abs/2602.15891",
